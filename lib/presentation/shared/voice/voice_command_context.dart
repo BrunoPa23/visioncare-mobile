@@ -1,0 +1,4 @@
+enum VoiceCommandContext {
+  home,
+  medicineInfo
+}
