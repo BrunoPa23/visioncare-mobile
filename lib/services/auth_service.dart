@@ -14,7 +14,7 @@ class AuthService {
   final CookieJar _cookieJar;
   final FlutterSecureStorage _secureStorage;
 
-  AuthService({this.apiUrl = '${AppConfig.apiBaseUrl}/amsac/v1'})
+  AuthService({this.apiUrl = '${AppConfig.apiBaseUrl}/vc/v1'})
       : _dio = Dio(),
         _cookieJar = CookieJar(),
         _secureStorage = FlutterSecureStorage() {
