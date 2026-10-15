@@ -171,7 +171,7 @@ class NotificationsViewModel extends ChangeNotifier {
 
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      
+      try {
       final medicine = ref.read(medicineProvider.notifier);
       late Medicines medicineToCreate;
       var userId = await _secureStorage.read(key: 'UserId');
@@ -180,8 +180,10 @@ class NotificationsViewModel extends ChangeNotifier {
       medicine.updateUserId(userId!);
 
       isLoading = true;
+      isError = false;
       notifyListeners();
 
+      if (!context.mounted) return;
       context.pushReplacement('/notifications/created');
 
       if(medicine.medicine == null) {
@@ -298,7 +300,13 @@ class NotificationsViewModel extends ChangeNotifier {
         final n = notificationsToSend[i];
         final backendNotificationId = await medicationService.createNotification(n);
 
-        if (backendNotificationId != "Error") {
+        if (backendNotificationId == "Error") {
+          // Si el backend no guardo el horario no se muestra la pantalla de exito
+          isError = true;
+          isLoading = false;
+          notifyListeners();
+          return;
+        } else {
           await notificationService.scheduleNotification(
             id: backendNotificationId,
             title: 'No olvides tomar tu medicamento',
@@ -310,7 +318,13 @@ class NotificationsViewModel extends ChangeNotifier {
 
       isLoading = false;
       notifyListeners();
-
+      } catch (e) {
+        // Cualquier fallo inesperado muestra el error en lugar de dejar la pantalla cargando
+        debugPrint('Error al crear el recordatorio: $e');
+        isError = true;
+        isLoading = false;
+        notifyListeners();
+      }
       });
   }
 

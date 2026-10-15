@@ -14,6 +14,7 @@ class StartupViewmodel extends ChangeNotifier{
   Future<void> checkAuth(BuildContext context) async{
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'AuthToken');
+    if (!context.mounted) return;
 
     if (token == null) {
       context.go('/login');

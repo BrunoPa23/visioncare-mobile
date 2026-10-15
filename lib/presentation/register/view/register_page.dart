@@ -47,6 +47,7 @@ class RegisterPage extends ConsumerWidget {
 
     if(!vm.isLoading && vm.registerSuccessful) {
       Future.delayed(Duration.zero, () {
+        if (!context.mounted) return;
         context.pushReplacement('/home');
       });
     }
