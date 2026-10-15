@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/models/medicines_time.dart';
 import 'package:visioncare_app/core/config/app_config.dart';
+import 'package:visioncare_app/services/auth_headers.dart';
 
 class MedicationService {
   //${AppConfig.apiBaseUrl}/api/medicine
@@ -15,9 +16,7 @@ class MedicationService {
     try {
       final response = await http.post(
         Uri.parse("$baseUrl/medicine"),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: await authHeaders({'Content-Type': 'application/json'}),
         body: json.encode(medicine.toJson()),
       );
       if (response.statusCode == 200) {
@@ -41,9 +40,7 @@ class MedicationService {
     try {
       final response = await http.post(
         Uri.parse("$baseUrl/medicine-time"),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: await authHeaders({'Content-Type': 'application/json'}),
         body: json.encode(medicinesTime.toJson()),
       );
       if (response.statusCode == 200) {
@@ -66,7 +63,7 @@ class MedicationService {
     try {
       var _secureStorage = FlutterSecureStorage();
       final id = await _secureStorage.read(key: 'UserId');
-      final response = await http.get(Uri.parse("$baseUrl/medicine/user/$id"));
+      final response = await http.get(Uri.parse("$baseUrl/medicine/user/$id"), headers: await authHeaders());
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
         List<Medicines> medications = responseData.map((item) => Medicines.fromMap(item)).toList();
@@ -87,7 +84,7 @@ class MedicationService {
 
   Future<bool> deleteMedication(String id) async {
     try {
-      final response = await http.delete(Uri.parse("$baseUrl/medicine/$id"));
+      final response = await http.delete(Uri.parse("$baseUrl/medicine/$id"), headers: await authHeaders());
       if (response.statusCode == 204) {
         debugPrint("Medication deleted successfully: $id");
         return true;
