@@ -21,9 +21,12 @@ class DatabaseHelper {
     return openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
+  // Un solo nombre de tabla para crear, insertar y consultar
+  static const _medicineTable = 'medicine';
+
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE medicine (
+      CREATE TABLE $_medicineTable (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT   NOT NULL,
         concept TEXT   NULL,
@@ -42,12 +45,12 @@ class DatabaseHelper {
 
   Future<int> insertMedicine(Map<String, dynamic> medicine) async {
     final db = await _instance.database;
-    return await db.insert('medicine', medicine);
+    return await db.insert(_medicineTable, medicine);
   }
 
   Future<List<Medicines>> getMedicines() async {
     final db = await _instance.database;
-    final List<Map<String, dynamic>> maps = await db.query('medicines');
+    final List<Map<String, dynamic>> maps = await db.query(_medicineTable);
     return List.generate(maps.length, (i) {
       return Medicines.fromMap(maps[i]);
     });
