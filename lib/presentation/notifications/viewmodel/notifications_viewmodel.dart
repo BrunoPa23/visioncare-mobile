@@ -183,6 +183,7 @@ class NotificationsViewModel extends ChangeNotifier {
       isError = false;
       notifyListeners();
 
+      if (!context.mounted) return;
       context.pushReplacement('/notifications/created');
 
       if(medicine.medicine == null) {

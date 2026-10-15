@@ -12,6 +12,7 @@ class StartupPage extends ConsumerWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.delayed(const Duration(seconds: 2));
+      if (!context.mounted) return;
       ref.read(startupViewmodelProvider).checkAuth(context); 
     });
 
