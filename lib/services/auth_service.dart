@@ -75,15 +75,17 @@ class AuthService {
     if (authToken != null) cookies.add(Cookie('AuthToken', authToken));
     if (refreshToken != null) cookies.add(Cookie('RefreshToken', refreshToken));
 
-    _cookieJar.saveFromResponse(Uri.parse('$apiUrl'), cookies);
+    await _cookieJar.saveFromResponse(Uri.parse('$apiUrl'), cookies);
   }
 
   Future<bool> isUserLoggedIn() async {
-    _loadCookies();
-    final response = await _dio.get('$apiUrl/auth-user/me');
-    if (response.statusCode == 200) {
-      return true;
-    } else {
+    // Las cookies deben estar cargadas antes de la peticion o se envia sin sesion
+    await _loadCookies();
+    try {
+      final response = await _dio.get('$apiUrl/auth-user/me');
+      return response.statusCode == 200;
+    } on DioException {
+      // Dio lanza excepcion ante 401 u otros errores; se trata como sesion no valida
       return false;
     }
   }

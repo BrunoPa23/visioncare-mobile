@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:visioncare_app/presentation/home/view/home_page.dart';
 import 'package:visioncare_app/presentation/information/view/information_page.dart';
 import 'package:visioncare_app/presentation/information/view/instructions_page.dart';
@@ -24,8 +26,21 @@ import 'package:visioncare_app/presentation/settings/view/speech_settings_page.d
 import 'package:visioncare_app/presentation/settings/view/text_settings_page.dart';
 import 'package:visioncare_app/presentation/startup/startup_page.dart';
 
+// Rutas que se pueden abrir sin sesion iniciada
+const _rutasPublicas = {'/', '/login', '/register'};
+
 final router = GoRouter(
   initialLocation: '/',
+  redirect: (context, state) async {
+    if (_rutasPublicas.contains(state.matchedLocation)) return null;
+
+    final token = await const FlutterSecureStorage().read(key: 'AuthToken');
+    if (token == null) return '/login';
+
+    // Con el token vencido se vuelve al inicio, que intenta renovarlo con el refresh token
+    if (JwtDecoder.isExpired(token)) return '/';
+    return null;
+  },
   routes: [
     GoRoute(
       path: '/',

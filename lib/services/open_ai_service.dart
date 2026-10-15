@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:visioncare_app/enums/request_type_enum.dart';
 import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/core/config/app_config.dart';
+import 'package:visioncare_app/services/auth_headers.dart';
 
 class OpenAiService {
   final String apiUrl;
@@ -20,9 +21,7 @@ class OpenAiService {
     try{
       final response = await http.post(
         Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: await authHeaders({'Content-Type': 'application/json'}),
         body: requestBody,
       );
 
