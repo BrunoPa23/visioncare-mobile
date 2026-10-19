@@ -30,7 +30,15 @@ class SpeechViewModel extends ChangeNotifier {
   }
 
   Future<void> initialize() async {
-    _isAvailable = await _speech.initialize();
+    _isAvailable = await _speech.initialize(
+      // Cuando el reconocimiento termina solo, el boton vuelve a su estado normal
+      onStatus: (status) {
+        if (status == SpeechToText.doneStatus || status == SpeechToText.notListeningStatus) {
+          _isListening = false;
+          notifyListeners();
+        }
+      },
+    );
     notifyListeners();
   }
 
