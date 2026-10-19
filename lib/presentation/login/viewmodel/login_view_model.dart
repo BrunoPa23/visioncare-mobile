@@ -25,6 +25,27 @@ class LoginViewModel extends ChangeNotifier {
     passwordController.addListener(_checkLoginButtonEnabled);
   }
 
+  // Mensaje que se muestra debajo de la contraseña cuando el login falla
+  String get errorMessage {
+    switch (errorAuthType) {
+      case ErrorAuthType.emptyFields:
+        return 'Escribe tu correo y tu contraseña para continuar.';
+      case ErrorAuthType.invalidEmail:
+        return 'El correo no es válido. Revisa que tenga @ y un punto, por ejemplo nombre@correo.com.';
+      case ErrorAuthType.invalidPassword:
+        return 'La contraseña debe tener al menos 8 caracteres, con letras y números.';
+      default:
+        return 'La contraseña no coincide con este correo. Inténtalo otra vez.';
+    }
+  }
+
+  void clearError() {
+    if (!hasBadLogin) return;
+    hasBadLogin = false;
+    errorAuthType = ErrorAuthType.none;
+    notifyListeners();
+  }
+
   void clearFields() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       emailController.clear();
@@ -61,6 +82,7 @@ class LoginViewModel extends ChangeNotifier {
       return;
     }
 
+    hasBadLogin = false;
     isLoading = true;
     notifyListeners();
 
@@ -73,6 +95,7 @@ class LoginViewModel extends ChangeNotifier {
     } else {
       hasBadLogin = true;
       loginSuccessful = false;
+      errorAuthType = ErrorAuthType.none;
     }
     notifyListeners();
   }
