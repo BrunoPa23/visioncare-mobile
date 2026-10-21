@@ -384,10 +384,6 @@ class NotificationsViewModel extends ChangeNotifier {
     }
   }
 
-  void instantNotification()  {
-    notificationService.showInstantNotification();
-  }
-
   Future<Medicines> createMedicationModel(String userId) async {
     return Medicines(
       name: medicationNameController.text,
