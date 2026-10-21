@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visioncare_app/core/constants/app_colors.dart';
 import 'package:visioncare_app/core/constants/app_secondary_button_style.dart';
-import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/presentation/information/viewmodel/instructions_view_model.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/medicine_provider.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/tts_view_model.dart';
@@ -28,7 +27,7 @@ class InstructionsPage extends ConsumerWidget {
 
     if (medicines?.instructions != null && medicines!.instructions!.isNotEmpty) {
       debugPrint("NO ESTOY HACIENDO LLAMADO");
-      return _buildInstructionsContent(context, ref, medicines!.instructions, searchQuery, ttsVM);
+      return _buildInstructionsContent(context, ref, medicines.instructions, searchQuery, ttsVM);
     }
 
     debugPrint("ESTOY HACIENDO LLAMADO");
@@ -81,7 +80,7 @@ class InstructionsPage extends ConsumerWidget {
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: instructions!.length,
+                itemCount: instructions.length,
                 itemBuilder: (context, index) {
                   return AppBodyText("- ${instructions[index]}", textAlign: TextAlign.start);
                 },

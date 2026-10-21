@@ -17,7 +17,6 @@ class TTSViewModel extends ChangeNotifier{
   double pitch = 1;
   double rate = 0.5;
   bool isCurrentLanguageInstalled = false;
-  String? _newVoiceText;
 
   TtsState ttsState = TtsState.stopped;
 
@@ -25,24 +24,6 @@ class TTSViewModel extends ChangeNotifier{
   bool get isStopped => ttsState == TtsState.stopped;
   bool get isPaused => ttsState == TtsState.paused;
   bool get isContinued => ttsState == TtsState.continued;
-
-  Future<dynamic> _getLanguages() async => await flutterTts.getLanguages;
-
-  Future<dynamic> _getEngines() async => await flutterTts.getEngines;
-
-  Future<void> _getDefaultEngine() async {
-    var engine = await flutterTts.getDefaultEngine;
-    if (engine != null) {
-      print(engine);
-    }
-  }
-
-  Future<void> _getDefaultVoice() async {
-    var voice = await flutterTts.getDefaultVoice;
-    if (voice != null) {
-      print(voice);
-    }
-  }
 
   TTSViewModel() {
     flutterTts.setStartHandler(() {

@@ -6,14 +6,12 @@ import 'package:visioncare_app/core/constants/app_border_focused.dart';
 import 'package:visioncare_app/core/constants/app_primary_button_style.dart';
 import 'package:visioncare_app/core/constants/app_secondary_button_style.dart';
 import 'package:visioncare_app/core/constants/app_text_label_style.dart';
-import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/presentation/information/viewmodel/search_view_model.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/medicine_provider.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/speech_view_model.dart';
 import 'package:visioncare_app/presentation/shared/voice/information_voice_handler.dart';
 import 'package:visioncare_app/presentation/shared/widgets/buttons/app_icon_button.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_button_text.dart';
-import 'package:visioncare_app/presentation/shared/widgets/text/app_label_text.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_title_text.dart';
 
 class SearchPage extends ConsumerWidget {

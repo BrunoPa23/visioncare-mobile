@@ -23,7 +23,6 @@ class AuthService {
 
   Future<bool> checkTokenExpired() async {
     var authToken = await _secureStorage.read(key: 'AuthToken');
-    var refreshToken = await _secureStorage.read(key: 'RefreshToken');
     bool isExpired = JwtDecoder.isExpired(authToken!);
     debugPrint('🔴 Token expira: ${JwtDecoder.getExpirationDate(authToken)}, is expired? $isExpired, duration: ${JwtDecoder.getRemainingTime(authToken)}');
     return isExpired;
