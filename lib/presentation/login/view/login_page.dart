@@ -152,38 +152,51 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Widget _buildHeader(LoginViewModel vm, bool isReading, double scale) {
     final themeLabel = _palette.isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
-    return Row(
+    // Wrap en lugar de Row: con el texto grande los botones bajan a otra linea en vez de desbordarse
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 10,
+      runSpacing: 12,
       children: [
         Image.asset('assets/images/logo_app.png', width: 48, height: 48, semanticLabel: 'Logo de VisionCare'),
-        const Spacer(),
-        Tooltip(
-          message: themeLabel,
-          child: OutlinedButton(
-            onPressed: () => ref
-                .read(themePreferenceProvider.notifier)
-                .set(_palette.isDark ? ThemePreference.light : ThemePreference.dark),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: _palette.text,
-              minimumSize: const Size(56, 56),
-              padding: EdgeInsets.zero,
-              side: BorderSide(color: _palette.border, width: 3),
-              shape: const CircleBorder(),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Tooltip(
+              message: themeLabel,
+              child: OutlinedButton(
+                onPressed: () => ref
+                    .read(themePreferenceProvider.notifier)
+                    .set(_palette.isDark ? ThemePreference.light : ThemePreference.dark),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: _palette.text,
+                  minimumSize: const Size(56, 56),
+                  padding: EdgeInsets.zero,
+                  side: BorderSide(color: _palette.border, width: 3),
+                  shape: const CircleBorder(),
+                ),
+                child: Icon(
+                  _palette.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                  size: 26,
+                  semanticLabel: themeLabel,
+                ),
+              ),
             ),
-            child: Icon(_palette.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined, size: 26),
-          ),
-        ),
-        const SizedBox(width: 10),
-        OutlinedButton.icon(
-          onPressed: () => _toggleReading(vm, isReading),
-          icon: Icon(isReading ? Icons.stop : Icons.volume_up_outlined, size: 24),
-          label: Text(isReading ? 'Detener' : 'Escuchar', style: _buttonStyle(17 * scale, _palette.text)),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: _palette.text,
-            minimumSize: const Size(0, 56),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            side: BorderSide(color: _palette.border, width: 3),
-            shape: const StadiumBorder(),
-          ),
+            const SizedBox(width: 10),
+            OutlinedButton.icon(
+              onPressed: () => _toggleReading(vm, isReading),
+              icon: Icon(isReading ? Icons.stop : Icons.volume_up_outlined, size: 24),
+              label: Text(isReading ? 'Detener' : 'Escuchar', style: _buttonStyle(17 * scale, _palette.text)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _palette.text,
+                minimumSize: const Size(0, 56),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                side: BorderSide(color: _palette.border, width: 3),
+                shape: const StadiumBorder(),
+              ),
+            ),
+          ],
         ),
       ],
     );
