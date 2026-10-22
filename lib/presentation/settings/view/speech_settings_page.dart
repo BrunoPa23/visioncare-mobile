@@ -63,7 +63,7 @@ class SpeechSettingsPage extends ConsumerWidget {
                             child: Container(
                               height: 5,
                               decoration: BoxDecoration(
-                                color: AppColors.DisabledButtonColor.withAlpha(150),
+                                color: AppColors.disabledButtonColor.withAlpha(150),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),

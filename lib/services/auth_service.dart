@@ -58,7 +58,7 @@ class AuthService {
   }
 
   Future<void> _saveCookies() async {
-    List<Cookie> cookies = await _cookieJar.loadForRequest(Uri.parse('$apiUrl'));
+    List<Cookie> cookies = await _cookieJar.loadForRequest(Uri.parse(apiUrl));
     
     for (var cookie in cookies) {
       await _secureStorage.write(key: cookie.name, value: cookie.value);
@@ -74,7 +74,7 @@ class AuthService {
     if (authToken != null) cookies.add(Cookie('AuthToken', authToken));
     if (refreshToken != null) cookies.add(Cookie('RefreshToken', refreshToken));
 
-    await _cookieJar.saveFromResponse(Uri.parse('$apiUrl'), cookies);
+    await _cookieJar.saveFromResponse(Uri.parse(apiUrl), cookies);
   }
 
   Future<bool> isUserLoggedIn() async {

@@ -62,8 +62,8 @@ class MedicinesPage extends ConsumerWidget {
                   onPressed: () {
                     context.pop();
                   },
+                  style: AppSecondaryButtonStyle.elevated,
                   child: AppButtonText("VOLVER"),
-                  style: AppSecondaryButtonStyle.elevated
                 ),
               ),
               vm.when(

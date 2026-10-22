@@ -7,5 +7,5 @@ class AppColors {
   static const Color backgroundColor = Color(0xFFFFFFFF); // White color
   static const Color textColor = Color(0xFF000000); // Black color
   static const Color cancelColor = Color(0xFFFF5C5C); // Red color
-  static const Color DisabledButtonColor = Color(0xFFCECECE); // Light Grey color
+  static const Color disabledButtonColor = Color(0xFFCECECE); // Light Grey color
 }
