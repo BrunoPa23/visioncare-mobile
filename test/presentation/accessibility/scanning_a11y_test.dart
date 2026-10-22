@@ -76,15 +76,44 @@ void main() {
     handle.dispose();
   });
 
+  testWidgets('sin lector de pantalla lee el resultado con la voz de la app', (tester) async {
+    final tts = FakeTtsViewModel();
+    await pump(tester, ResultsPage(imageFile: image), overrides: [
+      resultWith(Medicines(name: 'Paracetamol', expirationDate: '12/2027')),
+      ttsOverride(tts),
+    ]);
+
+    expect(tts.spoken, ['Medicamento reconocido: Paracetamol. Fecha de vencimiento: 12/2027.']);
+    expect(tester.takeAnnouncements(), isEmpty);
+  });
+
+  testWidgets('con lector de pantalla anuncia el resultado con SemanticsService', (tester) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(accessibleNavigation: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    final tts = FakeTtsViewModel();
+    await pump(tester, ResultsPage(imageFile: image), overrides: [
+      resultWith(Medicines(name: 'Paracetamol', expirationDate: '12/2027')),
+      ttsOverride(tts),
+    ]);
+
+    expect(
+      tester.takeAnnouncements(),
+      contains(isAccessibilityAnnouncement('Medicamento reconocido: Paracetamol. Fecha de vencimiento: 12/2027.')),
+    );
+    expect(tts.spoken, isEmpty);
+  });
+
   testWidgets('un error del backend muestra el motivo y permite reintentar o volver', (tester) async {
+    final tts = FakeTtsViewModel();
     await pump(tester, ResultsPage(imageFile: image), overrides: [
       resultViewModelProvider.overrideWith((ref, file) async => throw const ApiException('La imagen no es válida')),
-      ttsOverride(FakeTtsViewModel()),
+      ttsOverride(tts),
     ]);
 
     expect(find.text('NO SE PUDO LEER EL MEDICAMENTO'), findsOneWidget);
     expect(find.text('La imagen no es válida'), findsOneWidget);
     expect(find.text('INTENTAR DE NUEVO'), findsOneWidget);
     expect(find.text('VOLVER'), findsOneWidget);
+    expect(tts.spoken, ['No se pudo leer el medicamento. La imagen no es válida']);
   });
 }

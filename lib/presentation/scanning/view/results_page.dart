@@ -7,6 +7,7 @@ import 'package:visioncare_app/core/constants/app_secondary_button_style.dart';
 import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/presentation/notifications/viewmodel/notifications_viewmodel.dart';
 import 'package:visioncare_app/presentation/scanning/viewmodel/results_view_model.dart';
+import 'package:visioncare_app/presentation/shared/accessibility/announcer.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/medicine_provider.dart';
 import 'package:visioncare_app/presentation/shared/widgets/loading/app_loading_indicator.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_body_text.dart';
@@ -21,6 +22,12 @@ class ResultsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final resultVM = ref.watch(resultViewModelProvider(imageFile));
+
+    // El resultado se anuncia apenas llega, sin que la persona tenga que buscarlo en la pantalla
+    ref.listen<AsyncValue<Medicines>>(resultViewModelProvider(imageFile), (previous, next) {
+      if (next.isLoading) return;
+      announceResult(context, ref, resultAnnouncement(next));
+    });
 
     return Scaffold(
       body: resultVM.when(
@@ -49,6 +56,19 @@ class ResultsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Texto que se anuncia por voz o al lector de pantalla cuando termina el escaneo.
+  static String resultAnnouncement(AsyncValue<Medicines> result) {
+    final data = result.valueOrNull;
+    if (result.hasError || data == null) {
+      return 'No se pudo leer el medicamento. ${result.error ?? ''}'.trim();
+    }
+    if (data.name == 'Error') {
+      return 'No se pudo leer el medicamento. ${data.description ?? ''}'.trim();
+    }
+    return 'Medicamento reconocido: ${data.name}. '
+        'Fecha de vencimiento: ${data.expirationDate ?? 'no encontrada'}.';
   }
 
   Widget _buildResult(BuildContext context, WidgetRef ref, Medicines data) {
