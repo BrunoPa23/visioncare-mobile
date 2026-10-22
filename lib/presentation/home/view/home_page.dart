@@ -27,6 +27,7 @@ class HomePage extends ConsumerWidget {
             children: [
               IconButton(
                 style: AppIconButtonStyle.button,
+                tooltip: 'Ajustar el tamaño del texto',
                 icon: Icon(Icons.text_fields, color: AppColors.textColor, size: 30),
                 onPressed: () {
                   context.push('/textSettings');
@@ -35,6 +36,7 @@ class HomePage extends ConsumerWidget {
               SizedBox(width: 10),
               IconButton(
                 style: AppIconButtonStyle.button,
+                tooltip: 'Ajustar la voz de lectura',
                 icon: Icon(Icons.volume_up, color: AppColors.textColor, size: 30),
                 onPressed: () {
                   context.push('/speechSettings');
@@ -46,7 +48,10 @@ class HomePage extends ConsumerWidget {
 
           Center(
             child: AppIconButton(
-              icon: Icons.mic, 
+              icon: speechVM.isListening ? Icons.stop : Icons.mic,
+              label: speechVM.isListening
+                  ? 'Detener la escucha'
+                  : 'Hablar: di escanear, medicinas, consultar o farmacias',
               onPressed: () {
                 if (speechVM.isAvailable) {
                   speechVM.isListening ? speechVM.stopListening() : speechVM.startListening();

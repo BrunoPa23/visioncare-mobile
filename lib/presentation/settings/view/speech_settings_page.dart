@@ -35,6 +35,7 @@ class SpeechSettingsPage extends ConsumerWidget {
                   ),
                   AppIconButton(
                     icon: ttsVM.ttsState == TtsState.playing ? Icons.stop : Icons.play_arrow, 
+                    label: ttsVM.ttsState == TtsState.playing ? 'Detener la lectura' : 'Probar la voz con un texto de ejemplo',
                     onPressed: () {
                       if (ttsVM.ttsState == TtsState.playing) {
                         ttsVM.setStopHandler();

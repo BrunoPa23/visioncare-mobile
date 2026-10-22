@@ -30,49 +30,62 @@ class ScanningPage extends ConsumerWidget {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 2),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (scanningVM.image == null)
-                      Icon(Icons.add_a_photo_outlined, size: 100, color: AppColors.textColor),
-                    if (scanningVM.image == null) SizedBox(height: 10),
-                    if (scanningVM.image == null) AppSubtitleText("SELECCIONA UNA IMAGEN"),
-                    if (scanningVM.image == null) SizedBox(height: 30),
-                    if (scanningVM.image != null)
-                      Image.file(
-                        File(scanningVM.image!.path),
-                        width: double.infinity,
-                        height: 300,
-                        fit: BoxFit.cover,
-                      ),
-                    if (scanningVM.image != null)SizedBox(height: 20),
-                    if (scanningVM.image == null)
-                      ElevatedButton(
-                        style: AppPrimaryButtonStyle.elevated,
-                        onPressed: (){
-                          scanningVM.pickImage();
-                        }, 
-                        child: AppButtonText("ABRIR GALERIA", size: 18)
-                      ),
-                    if (scanningVM.image == null) SizedBox(height: 10),
-                    if (scanningVM.image == null)
-                      ElevatedButton(
-                        style: AppPrimaryButtonStyle.elevated,
-                        onPressed: (){
-                          scanningVM.takePicture();
-                        }, 
-                        child: AppButtonText("TOMAR UNA FOTO", size: 18)
-                      ),
-                    if (scanningVM.image != null)
-                      ElevatedButton(
-                        style: AppSecondaryButtonStyle.elevated,
-                        onPressed: (){
-                          scanningVM.clearImage();
-                        }, 
-                        child: AppButtonText("ELIMINAR IMAGEN", size: 18)
-                      ),
-                  ],
-                )
+                // Desplazable para que con el texto grande los botones no se salgan del recuadro
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (scanningVM.image == null)
+                          const ExcludeSemantics(
+                            child: Icon(Icons.add_a_photo_outlined, size: 100, color: AppColors.textColor),
+                          ),
+                        if (scanningVM.image == null) SizedBox(height: 10),
+                        if (scanningVM.image == null)
+                          Semantics(
+                            header: true,
+                            child: AppSubtitleText("SELECCIONA UNA IMAGEN", textAlign: TextAlign.center),
+                          ),
+                        if (scanningVM.image == null) SizedBox(height: 30),
+                        if (scanningVM.image != null)
+                          Image.file(
+                            File(scanningVM.image!.path),
+                            width: double.infinity,
+                            height: 300,
+                            fit: BoxFit.cover,
+                            semanticLabel: 'Foto del medicamento elegida',
+                          ),
+                        if (scanningVM.image != null)SizedBox(height: 20),
+                        if (scanningVM.image == null)
+                          ElevatedButton(
+                            style: AppPrimaryButtonStyle.elevated,
+                            onPressed: (){
+                              scanningVM.pickImage();
+                            }, 
+                            child: AppButtonText("ABRIR GALERÍA", size: 18)
+                          ),
+                        if (scanningVM.image == null) SizedBox(height: 10),
+                        if (scanningVM.image == null)
+                          ElevatedButton(
+                            style: AppPrimaryButtonStyle.elevated,
+                            onPressed: (){
+                              scanningVM.takePicture();
+                            }, 
+                            child: AppButtonText("TOMAR UNA FOTO", size: 18)
+                          ),
+                        if (scanningVM.image != null)
+                          ElevatedButton(
+                            style: AppSecondaryButtonStyle.elevated,
+                            onPressed: (){
+                              scanningVM.clearImage();
+                            }, 
+                            child: AppButtonText("ELIMINAR IMAGEN", size: 18)
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 20),
