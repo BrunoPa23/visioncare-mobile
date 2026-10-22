@@ -52,7 +52,7 @@ class AuthService {
         return false;
       }
     } catch (e) {
-      print('Error during sign-in: $e');
+      debugPrint('Error during sign-in: $e');
       return false;
     }
   }
@@ -189,7 +189,7 @@ class AuthService {
         return false;
       }
     } catch (e) {
-      print('Error during sign-up: $e');
+      debugPrint('Error during sign-up: $e');
       return false;
     }
   }

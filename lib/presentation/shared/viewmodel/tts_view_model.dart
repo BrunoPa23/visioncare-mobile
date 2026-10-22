@@ -49,7 +49,7 @@ class TTSViewModel extends ChangeNotifier{
 
   Future<void> setStartHandler(String text) async {
     List<dynamic> voices = await flutterTts.getVoices;
-    print(voices);
+    debugPrint('Voces disponibles: ${voices.length}');
     await flutterTts.setLanguage("es-ES");
     await flutterTts.setSpeechRate(rate); // Opcional
     await flutterTts.setVolume(volume);
