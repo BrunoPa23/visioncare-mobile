@@ -27,7 +27,7 @@ class NotificationsChooseType extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 40),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: AppPrimaryButtonStyle.elevated,
@@ -39,7 +39,7 @@ class NotificationsChooseType extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: 20),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: AppPrimaryButtonStyle.elevated,
@@ -51,7 +51,7 @@ class NotificationsChooseType extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: 20),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: AppPrimaryButtonStyle.elevated,
@@ -63,7 +63,7 @@ class NotificationsChooseType extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: 40),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: AppSecondaryButtonStyle.elevated,

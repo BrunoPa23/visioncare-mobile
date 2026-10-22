@@ -63,7 +63,7 @@ class TextSettingsPage extends ConsumerWidget {
                       const SizedBox(height: 40),
                       Column(
                         children: [
-                          Container(
+                          SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               style: AppPrimaryButtonStyle.elevated,
@@ -72,7 +72,7 @@ class TextSettingsPage extends ConsumerWidget {
                             ),
                           ),
                           SizedBox(height: 20),
-                          Container(
+                          SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               style: AppSecondaryButtonStyle.elevated,

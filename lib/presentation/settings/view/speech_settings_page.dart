@@ -115,7 +115,7 @@ class SpeechSettingsPage extends ConsumerWidget {
                             ],
                           ),
                           const SizedBox(height: 30),
-                          Container(
+                          SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               style: AppSecondaryButtonStyle.elevated,

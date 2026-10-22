@@ -198,7 +198,7 @@ class RegisterPage extends ConsumerWidget {
                   },
                 ),
                 SizedBox(height: 40),
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: ValueListenableBuilder<bool>(
                     valueListenable: vm.isButtonRegisterEnabled,
