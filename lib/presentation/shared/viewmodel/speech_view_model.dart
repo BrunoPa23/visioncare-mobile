@@ -50,9 +50,11 @@ class SpeechViewModel extends ChangeNotifier {
 
     await _speech.listen(
       onResult: _onSpeechResult,
-      listenFor: const Duration(seconds: 20),
-      pauseFor: const Duration(seconds: 5),
-      localeId: 'es_ES',
+      listenOptions: SpeechListenOptions(
+        listenFor: const Duration(seconds: 20),
+        pauseFor: const Duration(seconds: 5),
+        localeId: 'es_ES',
+      ),
     );
   }
 
