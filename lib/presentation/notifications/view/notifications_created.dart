@@ -5,18 +5,51 @@ import 'package:visioncare_app/core/constants/app_colors.dart';
 import 'package:visioncare_app/core/constants/app_primary_button_style.dart';
 import 'package:visioncare_app/presentation/medicines/viewmodel/medicines_view_model.dart';
 import 'package:visioncare_app/presentation/notifications/viewmodel/notifications_viewmodel.dart';
+import 'package:visioncare_app/presentation/shared/accessibility/announcer.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/medicine_provider.dart';
 import 'package:visioncare_app/presentation/shared/widgets/loading/app_loading_indicator.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_body_text.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_button_text.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_title_text.dart';
 
-class NotificationsCreated extends ConsumerWidget {
+class NotificationsCreated extends ConsumerStatefulWidget {
   const NotificationsCreated({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NotificationsCreated> createState() => _NotificationsCreatedState();
+
+  static String medicineName(WidgetRef ref) {
+    final typed = ref.read(notificationsViewModelProvider).medicationNameController.text;
+    return typed.isNotEmpty ? typed : ref.read(medicineProvider)?.name ?? '';
+  }
+
+  /// Confirmacion que se anuncia cuando el backend termina de guardar el recordatorio.
+  static String announcement({required bool isError, required String medicineName}) {
+    if (isError) return 'No se pudo guardar el recordatorio. Vuelve e inténtalo otra vez.';
+    return 'Recordatorio creado. Te avisaremos cuando debas tomar $medicineName.';
+  }
+}
+
+class _NotificationsCreatedState extends ConsumerState<NotificationsCreated> {
+  bool _announced = false;
+
+  // Se anuncia una sola vez, recien cuando el backend confirma (o falla), no mientras guarda
+  void _announceOnce(bool isError) {
+    if (_announced) return;
+    _announced = true;
+    final message = NotificationsCreated.announcement(
+      isError: isError,
+      medicineName: NotificationsCreated.medicineName(ref),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) announceResult(context, ref, message);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final notificationsVM = ref.watch(notificationsViewModelProvider);
+    if (notificationsVM.isLoading != true) _announceOnce(notificationsVM.isError == true);
 
     // Modo carga
     if (notificationsVM.isLoading == true) {
@@ -90,7 +123,7 @@ class NotificationsCreated extends ConsumerWidget {
                   child: Column(
                     children: [
                       const AppBodyText("Tu medicina", textAlign: TextAlign.center),
-                      AppTitleText(medicineName(ref).toUpperCase(), textAlign: TextAlign.center),
+                      AppTitleText(NotificationsCreated.medicineName(ref).toUpperCase(), textAlign: TextAlign.center),
                       const AppBodyText("Ha sido añadida correctamente", textAlign: TextAlign.center),
                     ],
                   ),
@@ -115,10 +148,5 @@ class NotificationsCreated extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  static String medicineName(WidgetRef ref) {
-    final typed = ref.read(notificationsViewModelProvider).medicationNameController.text;
-    return typed.isNotEmpty ? typed : ref.read(medicineProvider)?.name ?? '';
   }
 }
