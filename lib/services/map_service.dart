@@ -1,10 +1,14 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 
 
 class MapService {
+  // Cliente aparte del ApiClient: Google Places no usa el token de VisionCare
+  final Dio _dio;
+
+  MapService([Dio? dio]) : _dio = dio ?? Dio();
+
   Future<LocationData> getUserLocation() async {
     Location location = Location();
     bool serviceEnabled;
@@ -34,23 +38,21 @@ class MapService {
     required double lng,
     required String apiKey,
   }) async {
-    final url = Uri.parse(
-      'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-      '?location=$lat,$lng'
-      '&radius=2000'
-      '&type=pharmacy'
-      '&keyword=farmacia'
-      '&key=$apiKey',
-    );
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final results = data['results'] as List<dynamic>;
+    try {
+      final response = await _dio.get(
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+        queryParameters: {
+          'location': '$lat,$lng',
+          'radius': 2000,
+          'type': 'pharmacy',
+          'keyword': 'farmacia',
+          'key': apiKey,
+        },
+      );
+      final results = response.data['results'] as List<dynamic>;
       return results.cast<Map<String, dynamic>>();
-    } else {
-      throw Exception('Error al obtener lugares: ${response.body}');
+    } on DioException catch (e) {
+      throw Exception('Error al obtener lugares: ${e.response?.statusCode ?? e.type}');
     }
   }
 
