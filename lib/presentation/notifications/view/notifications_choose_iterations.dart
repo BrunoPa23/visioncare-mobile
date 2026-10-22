@@ -21,9 +21,9 @@ class NotificationsChooseIterations extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
           child: Column(
             children: [
-              AppTitleText("AÑADIR"),
+              Semantics(header: true, child: AppTitleText("AÑADIR")),
               const SizedBox(height: 20),
-              AppBodyText("¿Cuantas veces al día tomaras la medicación?", 
+              AppBodyText("¿Cada cuántas horas tomarás la medicación?", 
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),

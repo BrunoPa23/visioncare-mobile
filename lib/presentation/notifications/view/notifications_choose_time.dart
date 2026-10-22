@@ -16,45 +16,52 @@ class NotificationsChooseTime extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsVM = ref.watch(notificationsViewModelProvider);
+    final selectedHour = '${notificationsVM.selectedTime.hour.toString().padLeft(2, '0')}:'
+        '${notificationsVM.selectedTime.minute.toString().padLeft(2, '0')}';
 
     return Scaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 60),
         child: Column(
           children: [
-            AppTitleText("AÑADIR"),
+            Semantics(header: true, child: AppTitleText("AÑADIR")),
             SizedBox(height: 20),
             AppBodyText(
-              "¿A qué hora tomaras la medicación?",
+              "¿A qué hora tomarás la medicación?",
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 40),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,  
+            // Wrap: con el texto grande el boton baja de linea en vez de desbordarse
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 20,
+              runSpacing: 10,
               children: [
-                AppSubtitleText("${notificationsVM.selectedTime.hour.toString().padLeft(2, '0')}:${notificationsVM.selectedTime.minute.toString().padLeft(2, '0')}", 
-                  textAlign: TextAlign.center,
-                  size: 60,
-                ),
-                SizedBox(width: 20),
                 Semantics(
-                  label: "Seleccionar hora",
-                  button: true,
-                  child: AppIconButton(
-                    roundedRadius: 10,
-                    size: 30,
-                    icon: Icons.access_time, 
-                    onPressed: () async {
-                      final TimeOfDay? pickedTime = await showTimePicker(
-                        context: context,
-                        initialTime: notificationsVM.selectedTime,
-                      );
-                      if (pickedTime != null && pickedTime != notificationsVM.selectedTime) {
-                        notificationsVM.setSelectedTime(pickedTime);
-                      }
-                    }
+                  label: 'Hora elegida: $selectedHour',
+                  child: ExcludeSemantics(
+                    child: AppSubtitleText(selectedHour,
+                      textAlign: TextAlign.center,
+                      size: 60,
+                    ),
                   ),
-                )
+                ),
+                AppIconButton(
+                  roundedRadius: 10,
+                  size: 30,
+                  icon: Icons.access_time,
+                  label: 'Cambiar la hora',
+                  onPressed: () async {
+                    final TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: notificationsVM.selectedTime,
+                    );
+                    if (pickedTime != null && pickedTime != notificationsVM.selectedTime) {
+                      notificationsVM.setSelectedTime(pickedTime);
+                    }
+                  }
+                ),
               ],
             ),
             SizedBox(height: 40),

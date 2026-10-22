@@ -21,9 +21,9 @@ class NotificationsChooseFood extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
           child: Column(
             children: [
-              AppTitleText("AÑADIR"),
+              Semantics(header: true, child: AppTitleText("AÑADIR")),
               const SizedBox(height: 20),
-              AppBodyText("En que comida tomaras la medicación?", 
+              AppBodyText("¿En qué comida tomarás la medicación?", 
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),

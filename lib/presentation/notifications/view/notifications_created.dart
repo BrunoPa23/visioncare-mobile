@@ -5,25 +5,62 @@ import 'package:visioncare_app/core/constants/app_colors.dart';
 import 'package:visioncare_app/core/constants/app_primary_button_style.dart';
 import 'package:visioncare_app/presentation/medicines/viewmodel/medicines_view_model.dart';
 import 'package:visioncare_app/presentation/notifications/viewmodel/notifications_viewmodel.dart';
+import 'package:visioncare_app/presentation/shared/accessibility/announcer.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/medicine_provider.dart';
 import 'package:visioncare_app/presentation/shared/widgets/loading/app_loading_indicator.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_body_text.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_button_text.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_title_text.dart';
 
-class NotificationsCreated extends ConsumerWidget {
+class NotificationsCreated extends ConsumerStatefulWidget {
   const NotificationsCreated({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NotificationsCreated> createState() => _NotificationsCreatedState();
+
+  static String medicineName(WidgetRef ref) {
+    final typed = ref.read(notificationsViewModelProvider).medicationNameController.text;
+    return typed.isNotEmpty ? typed : ref.read(medicineProvider)?.name ?? '';
+  }
+
+  /// Confirmacion que se anuncia cuando el backend termina de guardar el recordatorio.
+  static String announcement({required bool isError, required String medicineName}) {
+    if (isError) return 'No se pudo guardar el recordatorio. Vuelve e inténtalo otra vez.';
+    return 'Recordatorio creado. Te avisaremos cuando debas tomar $medicineName.';
+  }
+}
+
+class _NotificationsCreatedState extends ConsumerState<NotificationsCreated> {
+  bool _announced = false;
+
+  // Se anuncia una sola vez, recien cuando el backend confirma (o falla), no mientras guarda
+  void _announceOnce(bool isError) {
+    if (_announced) return;
+    _announced = true;
+    final message = NotificationsCreated.announcement(
+      isError: isError,
+      medicineName: NotificationsCreated.medicineName(ref),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) announceResult(context, ref, message);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final notificationsVM = ref.watch(notificationsViewModelProvider);
+    if (notificationsVM.isLoading != true) _announceOnce(notificationsVM.isError == true);
 
     // Modo carga
     if (notificationsVM.isLoading == true) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: Center(
-          child: AppLoadingIndicator(),
+          child: Semantics(
+            liveRegion: true,
+            label: 'Guardando tu recordatorio, espera un momento',
+            child: const ExcludeSemantics(child: AppLoadingIndicator()),
+          ),
         ),
       );
     }
@@ -36,10 +73,10 @@ class NotificationsCreated extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error, color: Colors.red, size: 60),
+              const ExcludeSemantics(child: Icon(Icons.error, color: Colors.red, size: 60)),
               const SizedBox(height: 20),
-              const AppTitleText("Ocurrió un error"),
-              const AppBodyText("No se pudo guardar la medicina o las notificaciones."),
+              Semantics(header: true, child: const AppTitleText("Ocurrió un error", textAlign: TextAlign.center)),
+              const AppBodyText("No se pudo guardar la medicina o las notificaciones.", textAlign: TextAlign.center),
               const SizedBox(height: 20),
               ElevatedButton(
                 style: AppPrimaryButtonStyle.elevated,
@@ -66,27 +103,31 @@ class NotificationsCreated extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor,
-                    borderRadius: BorderRadius.circular(60),
-                  ),
-                  padding: const EdgeInsets.all(15),
-                  child: Icon(
-                    Icons.check,
-                    size: 50,
-                    color: AppColors.textColor,
+                ExcludeSemantics(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(60),
+                    ),
+                    padding: const EdgeInsets.all(15),
+                    child: Icon(
+                      Icons.check,
+                      size: 50,
+                      color: AppColors.textColor,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),
-                const AppBodyText("Tu medicina", textAlign: TextAlign.center),
-                AppTitleText(
-                  notificationsVM.medicationNameController.text.isEmpty
-                      ? ref.read(medicineProvider)!.name!.toUpperCase()
-                      : notificationsVM.medicationNameController.text.toUpperCase(),
-                  textAlign: TextAlign.center,
+                // Se lee como una sola frase: "Tu medicina X ha sido añadida correctamente"
+                MergeSemantics(
+                  child: Column(
+                    children: [
+                      const AppBodyText("Tu medicina", textAlign: TextAlign.center),
+                      AppTitleText(NotificationsCreated.medicineName(ref).toUpperCase(), textAlign: TextAlign.center),
+                      const AppBodyText("Ha sido añadida correctamente", textAlign: TextAlign.center),
+                    ],
+                  ),
                 ),
-                const AppBodyText("Ha sido añadida correctamente", textAlign: TextAlign.center),
                 const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,

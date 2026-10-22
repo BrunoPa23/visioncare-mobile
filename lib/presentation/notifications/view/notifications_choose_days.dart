@@ -21,9 +21,9 @@ class NotificationsChooseDays extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
           child: Column(
             children: [
-              const AppTitleText("AÑADIR"),
+              Semantics(header: true, child: AppTitleText("AÑADIR")),
               const SizedBox(height: 20),
-              AppBodyText("¿Qué días tomaras la medicación?", 
+              AppBodyText("¿Qué días tomarás la medicación?", 
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
@@ -42,7 +42,7 @@ class NotificationsChooseDays extends ConsumerWidget {
                 },
               ),
               CheckboxListTile(
-                title: AppBodyText("Miercoles"),
+                title: AppBodyText("Miércoles"),
                 value: notificationsVM.isWednesdaySelected, 
                 onChanged: (bool? value) {
                   notificationsVM.toggleDaySelection("Miercoles");
@@ -63,7 +63,7 @@ class NotificationsChooseDays extends ConsumerWidget {
                 },
               ),
               CheckboxListTile(
-                title: AppBodyText("Sabado"),
+                title: AppBodyText("Sábado"),
                 value: notificationsVM.isSaturdaySelected, 
                 onChanged: (bool? value) {
                   notificationsVM.toggleDaySelection("Sabado");
