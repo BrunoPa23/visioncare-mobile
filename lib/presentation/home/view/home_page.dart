@@ -61,7 +61,7 @@ class HomePage extends ConsumerWidget {
           ),
 
           SizedBox(height: 60),
-          Container(
+          SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: (){
@@ -78,7 +78,7 @@ class HomePage extends ConsumerWidget {
             ),
           ),
           SizedBox(height: 20),
-          Container(
+          SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: (){
@@ -112,7 +112,7 @@ class HomePage extends ConsumerWidget {
             ),
           ),
           SizedBox(height: 20),
-          Container(
+          SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: (){

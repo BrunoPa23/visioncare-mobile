@@ -16,6 +16,6 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      # Por ahora solo fallan los errores; los avisos heredados se limpian en M10
-      - run: flutter analyze --no-fatal-warnings --no-fatal-infos
+      # El analizador esta limpio: cualquier aviso nuevo hace fallar el build
+      - run: flutter analyze --fatal-infos
       - run: flutter test

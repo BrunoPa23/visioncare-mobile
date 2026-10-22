@@ -61,8 +61,7 @@ class MedicationService {
 
   Future<List<Medicines>> getAllMedicationById() async {
     try {
-      var _secureStorage = FlutterSecureStorage();
-      final id = await _secureStorage.read(key: 'UserId');
+      final id = await const FlutterSecureStorage().read(key: 'UserId');
       final response = await http.get(Uri.parse("$baseUrl/medicine/user/$id"), headers: await authHeaders());
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);

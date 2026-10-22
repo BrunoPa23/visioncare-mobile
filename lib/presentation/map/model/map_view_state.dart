@@ -33,7 +33,7 @@ class MapViewState {
       userLocation: userLocation ?? this.userLocation,
       markers: markers ?? this.markers,
       isLoading: isLoading ?? this.isLoading,
-      apiKey: this.apiKey,
+      apiKey: apiKey,
       error: error,
     );
   }

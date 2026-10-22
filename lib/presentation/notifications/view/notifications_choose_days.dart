@@ -77,7 +77,7 @@ class NotificationsChooseDays extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: 40),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: AppPrimaryButtonStyle.elevated,
@@ -88,7 +88,7 @@ class NotificationsChooseDays extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: AppSecondaryButtonStyle.elevated,

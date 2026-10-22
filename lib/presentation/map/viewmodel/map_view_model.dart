@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:visioncare_app/presentation/map/model/MapViewState.dart';
+import 'package:visioncare_app/presentation/map/model/map_view_state.dart';
 import 'package:visioncare_app/services/map_service.dart';
 
 final mapViewModelProvider =

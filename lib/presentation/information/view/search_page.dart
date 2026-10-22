@@ -75,8 +75,8 @@ class SearchPage extends ConsumerWidget {
                       ref.read(medicineProvider.notifier).clearMedicine();
                       context.push('/information', extra: {'searchQuery': searchVM.searchController.text});
                     },
+                    style: AppPrimaryButtonStyle.elevated,
                     child: AppButtonText("BUSCAR"),
-                    style: AppPrimaryButtonStyle.elevated
                   ),
                 ),
                 SizedBox(height: 10),
@@ -87,8 +87,8 @@ class SearchPage extends ConsumerWidget {
                       ref.read(medicineProvider.notifier).clearMedicine();
                       context.pop();
                     },
+                    style: AppSecondaryButtonStyle.elevated,
                     child: AppButtonText("VOLVER"),
-                    style: AppSecondaryButtonStyle.elevated
                   ),
                 ),
               ],
