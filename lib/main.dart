@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visioncare_app/app/router.dart';
+import 'package:visioncare_app/core/network/api_client.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:visioncare_app/services/notification_service.dart';
@@ -20,6 +21,8 @@ void main() async {
     ProviderScope(
       overrides: [
         notificationServiceProvider.overrideWithValue(notificationService),
+        // Si la sesion vence y no se puede renovar, se vuelve al login
+        sessionExpiredCallbackProvider.overrideWithValue(() => router.go('/login')),
       ],
       child: VisionCareApp(),
     ),
