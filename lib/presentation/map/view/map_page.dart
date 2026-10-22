@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:visioncare_app/core/constants/app_colors.dart';
-import 'package:visioncare_app/presentation/map/viewmodel/MapViewModel.dart';
+import 'package:visioncare_app/presentation/map/viewmodel/map_view_model.dart';
 import 'package:visioncare_app/presentation/shared/widgets/loading/app_loading_indicator.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_title_text.dart';
 

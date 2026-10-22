@@ -7,7 +7,7 @@ import 'package:visioncare_app/core/constants/app_secondary_button_style.dart';
 import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/presentation/medicines/viewmodel/medicines_view_model.dart';
 import 'package:visioncare_app/presentation/notifications/viewmodel/notifications_viewmodel.dart';
-import 'package:visioncare_app/presentation/shared/utils/getRememberHourOnly.dart';
+import 'package:visioncare_app/presentation/shared/utils/get_remember_hour_only.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/medicine_provider.dart';
 import 'package:visioncare_app/presentation/shared/widgets/loading/app_loading_indicator.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_body_text.dart';
