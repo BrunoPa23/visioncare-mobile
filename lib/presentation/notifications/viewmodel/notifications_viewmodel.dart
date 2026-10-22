@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as ref;
 import 'package:timezone/timezone.dart';
 import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/models/medicines_time.dart';
@@ -187,7 +186,7 @@ class NotificationsViewModel extends ChangeNotifier {
       context.pushReplacement('/notifications/created');
 
       if(medicine.medicine == null) {
-        medicineToCreate = await createMedicationModel(userId!);
+        medicineToCreate = await createMedicationModel(userId);
         debugPrint("Creating medication model: ${medicineToCreate.toJson()}");
       }
       else {
@@ -204,8 +203,6 @@ class NotificationsViewModel extends ChangeNotifier {
         return;
       }
 
-      final now = DateTime.now();
-      final tzNow = tz.TZDateTime.from(now, tz.local);
 
       List<TZDateTime> notificationTimes = [];
       List<MedicinesTime> notificationsToSend = [];
@@ -382,10 +379,6 @@ class NotificationsViewModel extends ChangeNotifier {
       default:
         return 0;
     }
-  }
-
-  void instantNotification()  {
-    notificationService.showInstantNotification();
   }
 
   Future<Medicines> createMedicationModel(String userId) async {

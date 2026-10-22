@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visioncare_app/core/constants/app_colors.dart';
 import 'package:visioncare_app/core/constants/app_secondary_button_style.dart';
-import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/presentation/information/viewmodel/side_effects_view_model.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/medicine_provider.dart';
 import 'package:visioncare_app/presentation/shared/viewmodel/tts_view_model.dart';
@@ -24,7 +23,7 @@ class SideEffectsPage extends ConsumerWidget {
 
     if (medicines?.sideEffects != null && medicines!.sideEffects!.isNotEmpty) {
       debugPrint("✅ No hago llamado - sideEffects ya existen");
-      return _buildSideEffectsContent(context, medicines!.sideEffects!, searchQuery, ttsVM);
+      return _buildSideEffectsContent(context, medicines.sideEffects!, searchQuery, ttsVM);
     }
 
     debugPrint("🔁 Haciendo llamado API - sideEffects no existen");

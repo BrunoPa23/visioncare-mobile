@@ -28,9 +28,7 @@ class ScanningViewModel extends ChangeNotifier{
       );
       setImage(selectedImage);
     } catch (e) {
-      if (kDebugMode) {
-        print('Error picking image: $e');
-      }
+      debugPrint('Error picking image: $e');
     }
   }
 
@@ -42,9 +40,7 @@ class ScanningViewModel extends ChangeNotifier{
       );
       setImage(capturedImage);
     } catch (e) {
-      if (kDebugMode) {
-        print('Error taking picture: $e');
-      }
+      debugPrint('Error taking picture: $e');
     }
   }
 }

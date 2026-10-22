@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:visioncare_app/core/constants/app_primary_button_style.dart';
 import 'package:visioncare_app/core/constants/app_secondary_button_style.dart';
 import 'package:visioncare_app/presentation/notifications/viewmodel/notifications_viewmodel.dart';
-import 'package:visioncare_app/presentation/shared/viewmodel/medicine_provider.dart';
 import 'package:visioncare_app/presentation/shared/widgets/buttons/app_icon_button.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_body_text.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_button_text.dart';
@@ -17,7 +16,6 @@ class NotificationsChooseTime extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsVM = ref.watch(notificationsViewModelProvider);
-    final medicinesVM = ref.watch(medicineProvider.notifier);
 
     return Scaffold(
       body: SingleChildScrollView(

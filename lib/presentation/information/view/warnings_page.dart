@@ -23,7 +23,7 @@ class WarningsPage extends ConsumerWidget {
 
     if (medicines?.warnings != null && medicines!.warnings!.isNotEmpty) {
       debugPrint("✅ No hago llamado - warnings ya existen");
-      return _buildWarningsContent(context, medicines!.warnings!, searchQuery, ttsVM);
+      return _buildWarningsContent(context, medicines.warnings!, searchQuery, ttsVM);
     }
 
     debugPrint("🔁 Haciendo llamado API - warnings no existen");

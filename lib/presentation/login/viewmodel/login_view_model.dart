@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visioncare_app/enums/error_auth_type_enum.dart';
-import 'package:visioncare_app/presentation/shared/dialogs/bad_login_dialog.dart';
 import 'package:visioncare_app/services/auth_service.dart';
 
 

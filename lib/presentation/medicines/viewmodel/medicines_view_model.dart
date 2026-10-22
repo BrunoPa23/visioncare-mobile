@@ -30,7 +30,7 @@ Future<void> deleteMedicine(WidgetRef ref, String medicineId) async {
     ref.read(deletingMedicinesProvider.notifier).state = newMap;
 
     // Refrescar lista
-    ref.refresh(getAllMedicinesProvider);
+    ref.invalidate(getAllMedicinesProvider);
   } catch (e, st) {
     // Marcar error
     ref.read(deletingMedicinesProvider.notifier).state = {

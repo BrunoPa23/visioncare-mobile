@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:visioncare_app/core/constants/app_colors.dart';
 import 'package:visioncare_app/core/constants/app_primary_button_style.dart';

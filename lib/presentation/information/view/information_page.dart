@@ -29,7 +29,7 @@ class InformationPage extends ConsumerWidget {
 
     if (medicine != null && medicine.description != null) {
       debugPrint("YA EXISTE");
-      return _buildContent(context, ref, medicine!, searchQuery, ttsVM);
+      return _buildContent(context, ref, medicine, searchQuery, ttsVM);
     }
 
     debugPrint("HARE UN LLAMADO");
