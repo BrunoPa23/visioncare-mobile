@@ -21,17 +21,27 @@ Patron MVVM con Riverpod para el estado y go_router para la navegacion:
 ```
 lib/
 ├── app/            Router de la aplicacion
-├── core/           Configuracion, constantes de estilo y base de datos local
+├── core/           Configuracion, ApiClient, constantes de estilo y base de datos local
 ├── models/         Modelos de dominio (usuario, medicamento, horarios)
 ├── services/       Clientes HTTP del backend, mapas y notificaciones
 └── presentation/   Pantallas por funcionalidad, cada una con su view y su viewmodel
 ```
 
+### Llamadas al backend
+
+Todas las llamadas pasan por `ApiClient` (`lib/core/network/api_client.dart`), un cliente Dio unico que se obtiene con `ref.read(apiClientProvider)`:
+
+- Agrega `Authorization: Bearer <token>` a las llamadas autenticadas y guarda los tokens que el backend envia como cookies al iniciar sesion o renovar.
+- Ante un 401 renueva la sesion con el refresh token y repite la llamada una vez; si no puede, borra la sesion y vuelve al login.
+- Convierte los errores en `ApiException` con un mensaje en espanol (usa el `title` de ProblemDetails cuando el backend lo envia).
+
+Los tests usan un adaptador HTTP falso (`test/helpers/fake_http.dart`), asi que nunca llaman al backend, a Azure ni a OpenAI.
+
 ## Stack
 
 - Flutter y Dart
 - Riverpod, go_router
-- Dio con manejo de cookies, http
+- Dio (un ApiClient unico inyectado con Riverpod)
 - flutter_secure_storage, jwt_decoder, sqflite
 - speech_to_text, flutter_tts
 - flutter_local_notifications, timezone
