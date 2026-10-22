@@ -91,6 +91,7 @@ class WarningsPage extends ConsumerWidget {
             const SizedBox(height: 30),
             AppIconButton(
               icon: ttsVM.ttsState == TtsState.playing ? Icons.stop : Icons.play_arrow,
+              label: ttsVM.ttsState == TtsState.playing ? 'Detener la lectura' : 'Leer en voz alta las advertencias',
               onPressed: () {
                 if (ttsVM.ttsState == TtsState.playing) {
                   ttsVM.setStopHandler();

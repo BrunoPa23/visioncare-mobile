@@ -88,6 +88,7 @@ class InstructionsPage extends ConsumerWidget {
             const SizedBox(height: 30),
             AppIconButton(
               icon: ttsVM.ttsState == TtsState.playing ? Icons.stop : Icons.play_arrow,
+              label: ttsVM.ttsState == TtsState.playing ? 'Detener la lectura' : 'Leer en voz alta las instrucciones',
               onPressed: () {
                 if (ttsVM.ttsState == TtsState.playing) {
                   ttsVM.setStopHandler();

@@ -40,7 +40,8 @@ class SearchPage extends ConsumerWidget {
                 AppTitleText("CONSULTAR"),
                 SizedBox(height: 80),
                 AppIconButton(
-                  icon: Icons.mic, 
+                  icon: speechVM.isListening ? Icons.stop : Icons.mic,
+                  label: speechVM.isListening ? 'Detener el dictado' : 'Dictar el nombre del medicamento',
                   onPressed: () {
                     if (speechVM.isAvailable) {
                       speechVM.isListening ? speechVM.stopListening() : speechVM.startListening();
