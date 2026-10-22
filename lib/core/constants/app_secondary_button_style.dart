@@ -5,6 +5,8 @@ class AppSecondaryButtonStyle {
   static final elevated = ElevatedButton.styleFrom(
     backgroundColor: AppColors.cancelColor,
     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+    // Area tactil comoda para personas con baja vision (minimo recomendado: 48 dp)
+    minimumSize: const Size(64, 56),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
     )
