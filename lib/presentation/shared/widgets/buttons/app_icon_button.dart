@@ -11,6 +11,8 @@ class AppIconButton extends ConsumerWidget {
   final Color? color;
   final Color? backgroundColor;
   final double? roundedRadius;
+  /// Lo que lee el lector de pantalla; un boton solo con icono necesita esta etiqueta.
+  final String? label;
 
   const AppIconButton({
     super.key,
@@ -20,6 +22,7 @@ class AppIconButton extends ConsumerWidget {
     this.color,
     this.backgroundColor,
     this.roundedRadius,
+    this.label,
   });
 
   @override
@@ -27,8 +30,10 @@ class AppIconButton extends ConsumerWidget {
     final scale = ref.watch(textScaleProvider);
     
     return IconButton(
-      icon: Icon(icon, size: (size ?? 30)*scale , color: color ?? Colors.black),
+      icon: Icon(icon, size: (size ?? 30)*scale , color: color ?? Colors.black, semanticLabel: label),
+      tooltip: label,
       onPressed: onPressed,
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
       style: IconButton.styleFrom(
         padding: EdgeInsets.all(20),
         backgroundColor: backgroundColor ?? AppColors.primaryColor,

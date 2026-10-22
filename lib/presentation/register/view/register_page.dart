@@ -11,6 +11,7 @@ import 'package:visioncare_app/presentation/register/viewmodel/register_view_mod
 import 'package:visioncare_app/presentation/shared/dialogs/bad_register_dialog.dart';
 import 'package:visioncare_app/presentation/shared/dialogs/invalid_password_email_dialog.dart';
 import 'package:visioncare_app/presentation/shared/dialogs/terms_not_accepted_dialog.dart';
+import 'package:visioncare_app/presentation/shared/viewmodel/text_scale_notifier.dart';
 import 'package:visioncare_app/presentation/shared/widgets/loading/app_loading_indicator.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_body_text.dart';
 import 'package:visioncare_app/presentation/shared/widgets/text/app_button_text.dart';
@@ -23,6 +24,7 @@ class RegisterPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final vm = ref.watch(registerViewModelProvider);
+    final scale = ref.watch(textScaleProvider);
 
     if(!vm.isLoading && vm.hasBadRegister) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -55,16 +57,23 @@ class RegisterPage extends ConsumerWidget {
     return vm.isLoading ? 
     Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: const Center(
+      body: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AppTitleText("REGISTRANDO CUENTA", textAlign: TextAlign.center),
-                SizedBox(height: 60),
-                AppLoadingIndicator(),
-              ],
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            // El lector de pantalla anuncia el cambio de estado sin que la persona tenga que buscarlo
+            child: Semantics(
+              liveRegion: true,
+              label: 'Registrando tu cuenta, espera un momento',
+              child: const ExcludeSemantics(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AppTitleText("REGISTRANDO CUENTA", textAlign: TextAlign.center),
+                    SizedBox(height: 60),
+                    AppLoadingIndicator(),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -80,11 +89,14 @@ class RegisterPage extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(child: AppTitleText("REGISTRATE")),
+                Center(child: Semantics(header: true, child: AppTitleText("REGÍSTRATE"))),
                 SizedBox(height: 40),
                 TextField(
                   controller: vm.nameController,
                   keyboardType: TextInputType.name,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.givenName],
                   style: AppTextLabelStyle.style,
                   decoration: InputDecoration(
                     label: AppLabelText("Nombre"),
@@ -97,6 +109,9 @@ class RegisterPage extends ConsumerWidget {
                 TextField(
                   controller: vm.lastNameController,
                   keyboardType: TextInputType.name,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.familyName],
                   style: AppTextLabelStyle.style,
                   decoration: InputDecoration(
                     label: AppLabelText("Apellido"),
@@ -109,9 +124,11 @@ class RegisterPage extends ConsumerWidget {
                 TextField(
                   controller: vm.emailController,
                   keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
                   style: AppTextLabelStyle.style,
                   decoration: InputDecoration(
-                    label: AppLabelText("Correo Electrónico"),
+                    label: AppLabelText("Correo electrónico"),
                     enabledBorder: AppBorderEnable.borderEnableTextField,
                     focusedBorder: AppBorderFocused.borderFocusedTextField,
                     contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
@@ -121,40 +138,56 @@ class RegisterPage extends ConsumerWidget {
                 TextField(
                   controller: vm.passwordController,
                   obscureText: true,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.newPassword],
                   style: AppTextLabelStyle.style,
                   decoration: InputDecoration(
                     label: AppLabelText("Contraseña"),
+                    // La regla se muestra antes de escribir para no descubrirla recien con el error
+                    helperText: 'Al menos 8 caracteres, con letras y números.',
+                    helperMaxLines: 3,
+                    helperStyle: TextStyle(fontSize: 16 * scale, color: AppColors.textColor),
                     enabledBorder: AppBorderEnable.borderEnableTextField,
                     focusedBorder: AppBorderFocused.borderFocusedTextField,
                     contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
                   ),
                 ),
                 SizedBox(height: 30),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: Colors.black, width: 2),
+                ExcludeSemantics(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: AppBodyText("Grado de discapacidad visual"),
                   ),
-                  child: DropdownButton<String>(
-                    focusColor: AppColors.primaryColor,
-                    borderRadius: BorderRadius.circular(10),
-                    iconSize: 30,
-                    style: AppTextLabelStyle.style,
-                    underline: Container(height: 0),
-                    items: vm.visualDegrees
-                        .map((degree) => DropdownMenuItem<String>(
-                              value: degree,
-                              child: Text(degree),
-                            ))
-                        .toList(),
-                    value: vm.selectedDegree,
-                    onChanged: (value) {
-                      if (value != null) {
-                        vm.setSelectedDegree(value);
-                      }
-                    },
-                    isExpanded: true,
+                ),
+                SizedBox(height: 10),
+                Semantics(
+                  label: 'Grado de discapacidad visual',
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.black, width: 2),
+                    ),
+                    child: DropdownButton<String>(
+                      focusColor: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                      iconSize: 30,
+                      style: AppTextLabelStyle.style,
+                      underline: Container(height: 0),
+                      items: vm.visualDegrees
+                          .map((degree) => DropdownMenuItem<String>(
+                                value: degree,
+                                child: Text(degree),
+                              ))
+                          .toList(),
+                      value: vm.selectedDegree,
+                      onChanged: (value) {
+                        if (value != null) {
+                          vm.setSelectedDegree(value);
+                        }
+                      },
+                      isExpanded: true,
+                    ),
                   ),
                 ),
                 SizedBox(height: 30),
@@ -165,7 +198,7 @@ class RegisterPage extends ConsumerWidget {
                     readOnly: true,
                     style: AppTextLabelStyle.style,
                     decoration: InputDecoration(
-                      label: AppLabelText("Fecha de Nacimiento"),
+                      label: AppLabelText("Fecha de nacimiento"),
                       enabledBorder: AppBorderEnable.borderEnableTextField,
                       focusedBorder: AppBorderFocused.borderFocusedTextField,
                       contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),

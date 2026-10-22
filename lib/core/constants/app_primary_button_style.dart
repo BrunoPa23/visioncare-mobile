@@ -6,6 +6,8 @@ class AppPrimaryButtonStyle {
     disabledBackgroundColor: AppColors.disabledButtonColor,
     backgroundColor: AppColors.primaryColor,
     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+    // Area tactil comoda para personas con baja vision (minimo recomendado: 48 dp)
+    minimumSize: const Size(64, 56),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
     )
