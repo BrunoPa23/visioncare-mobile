@@ -25,14 +25,16 @@ class NotificationsInputMedication extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
           child: Column(
             children: [
-              AppTitleText("AÑADIR"),
+              Semantics(header: true, child: AppTitleText("AÑADIR")),
               const SizedBox(height: 20),
-              AppBodyText("¿Como se llama la medicación?", 
+              AppBodyText("¿Cómo se llama la medicación?", 
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
               TextField(
                 controller: notificationsVM.medicationNameController,
+                textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.done,
                 style: AppTextLabelStyle.style,
                 decoration: InputDecoration(
                   label: AppLabelText("Nombre de la medicación"),

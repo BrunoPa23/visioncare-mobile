@@ -28,7 +28,7 @@ class MedicinesPage extends ConsumerWidget {
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 60),
           child: Column(
             children: [
-              AppTitleText("MEDICINAS"),
+              Semantics(header: true, child: AppTitleText("MEDICINAS")),
               SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -80,18 +80,28 @@ class MedicinesPage extends ConsumerWidget {
                   }
                   return _buildContent(context, ref, data);
                 } , 
-                error: (error, stack) => Center(
-                  child: AppTitleText("Error al cargar las medicinas: $error"),
+                error: (error, stack) => Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Semantics(
+                    liveRegion: true,
+                    child: AppSubtitleText("No se pudieron cargar tus medicinas: $error", textAlign: TextAlign.center),
+                  ),
                 ),
                 loading: () => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 20),
-                      AppTitleText("CARGANDO MEDICINAS", textAlign: TextAlign.center),
-                      SizedBox(height: 60),
-                      AppLoadingIndicator(),
-                    ],
+                  child: Semantics(
+                    liveRegion: true,
+                    label: 'Cargando tus medicinas',
+                    child: const ExcludeSemantics(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 20),
+                          AppTitleText("CARGANDO MEDICINAS", textAlign: TextAlign.center),
+                          SizedBox(height: 60),
+                          AppLoadingIndicator(),
+                        ],
+                      ),
+                    ),
                   ),
                 )
               )
@@ -111,6 +121,8 @@ class MedicinesPage extends ConsumerWidget {
         final medicine = medicines[index];
         final deletingMap = ref.watch(deletingMedicinesProvider);
         final isDeleting = deletingMap[medicine.id]?.isLoading ?? false;
+        final name = medicine.name ?? 'Sin nombre';
+        final notifications = medicine.notifications ?? [];
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Card(
@@ -123,22 +135,30 @@ class MedicinesPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  AppSubtitleText(
-                    medicine.name!.toUpperCase(),
-                    textAlign: TextAlign.start,
-                  ),
-                  const SizedBox(height: 8),
-                  AppBodyText(
-                    medicine.notifications == [] ? 'Sin días seleccionados' : 'Días: ${medicine.notifications!.map((e) => e.day).toSet().join(', ')}',
-                  ),
-                  AppBodyText(
-                    medicine.notifications == [] ? 'Sin horas seleccionadas' :  'Hora: ${medicine.notifications!
-                        .map((e) => getRememberHourOnly(e))
-                        .toSet()
-                        .join(', ')}',
-                  ),
-                  AppBodyText(
-                    medicine.expirationDate == null ? 'Fecha de vencimiento: No encontrada' : 'Fecha de vencimiento: ${medicine.expirationDate}',
+                  // Los datos de la tarjeta se leen juntos, antes de sus botones
+                  MergeSemantics(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Semantics(
+                          header: true,
+                          child: AppSubtitleText(name.toUpperCase(), textAlign: TextAlign.start),
+                        ),
+                        const SizedBox(height: 8),
+                        AppBodyText(
+                          notifications.isEmpty ? 'Sin días seleccionados' : 'Días: ${notifications.map((e) => e.day).toSet().join(', ')}',
+                        ),
+                        AppBodyText(
+                          notifications.isEmpty ? 'Sin horas seleccionadas' : 'Hora: ${notifications
+                              .map((e) => getRememberHourOnly(e))
+                              .toSet()
+                              .join(', ')}',
+                        ),
+                        AppBodyText(
+                          medicine.expirationDate == null ? 'Fecha de vencimiento: No encontrada' : 'Fecha de vencimiento: ${medicine.expirationDate}',
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 15),
                   ElevatedButton(
@@ -147,13 +167,13 @@ class MedicinesPage extends ConsumerWidget {
                       context.push('/information');
                     },
                     style: AppPrimaryButtonStyle.elevated,
-                    child: AppButtonText("INFORMACIÓN"),
+                    child: _buttonLabel("INFORMACIÓN", 'Ver la información de $name'),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {}, 
                     style: AppPrimaryButtonStyle.elevated,
-                    child: AppButtonText('EDITAR'),
+                    child: _buttonLabel('EDITAR', 'Editar $name'),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
@@ -164,12 +184,15 @@ class MedicinesPage extends ConsumerWidget {
                           },
                     style: AppSecondaryButtonStyle.elevated,
                     child: isDeleting
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: AppLoadingIndicator(scale: 0.7, strokeWidth: 8,),
+                        ? Semantics(
+                            label: 'Eliminando $name',
+                            child: const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: ExcludeSemantics(child: AppLoadingIndicator(scale: 0.7, strokeWidth: 8,)),
+                            ),
                           )
-                        : AppButtonText('ELIMINAR'),
+                        : _buttonLabel('ELIMINAR', 'Eliminar $name'),
                   ),
                 ],
               ),
@@ -177,6 +200,14 @@ class MedicinesPage extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  // El texto visible es corto; el lector de pantalla dice tambien de que medicina se trata
+  Widget _buttonLabel(String text, String semanticLabel) {
+    return Semantics(
+      label: semanticLabel,
+      child: ExcludeSemantics(child: AppButtonText(text)),
     );
   }
 }

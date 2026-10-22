@@ -21,7 +21,7 @@ class NotificationsChooseType extends ConsumerWidget {
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 60),
           child: Column(
             children: [
-              AppTitleText("AÑADIR"),
+              Semantics(header: true, child: AppTitleText("AÑADIR")),
               SizedBox(height: 20),
               AppBodyText("¿En qué momento tomaras la medicación?", 
                 textAlign: TextAlign.center,

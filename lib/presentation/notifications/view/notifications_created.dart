@@ -20,10 +20,14 @@ class NotificationsCreated extends ConsumerWidget {
 
     // Modo carga
     if (notificationsVM.isLoading == true) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: Center(
-          child: AppLoadingIndicator(),
+          child: Semantics(
+            liveRegion: true,
+            label: 'Guardando tu recordatorio, espera un momento',
+            child: const ExcludeSemantics(child: AppLoadingIndicator()),
+          ),
         ),
       );
     }
@@ -36,10 +40,10 @@ class NotificationsCreated extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error, color: Colors.red, size: 60),
+              const ExcludeSemantics(child: Icon(Icons.error, color: Colors.red, size: 60)),
               const SizedBox(height: 20),
-              const AppTitleText("Ocurrió un error"),
-              const AppBodyText("No se pudo guardar la medicina o las notificaciones."),
+              Semantics(header: true, child: const AppTitleText("Ocurrió un error", textAlign: TextAlign.center)),
+              const AppBodyText("No se pudo guardar la medicina o las notificaciones.", textAlign: TextAlign.center),
               const SizedBox(height: 20),
               ElevatedButton(
                 style: AppPrimaryButtonStyle.elevated,
@@ -66,27 +70,31 @@ class NotificationsCreated extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor,
-                    borderRadius: BorderRadius.circular(60),
-                  ),
-                  padding: const EdgeInsets.all(15),
-                  child: Icon(
-                    Icons.check,
-                    size: 50,
-                    color: AppColors.textColor,
+                ExcludeSemantics(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(60),
+                    ),
+                    padding: const EdgeInsets.all(15),
+                    child: Icon(
+                      Icons.check,
+                      size: 50,
+                      color: AppColors.textColor,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),
-                const AppBodyText("Tu medicina", textAlign: TextAlign.center),
-                AppTitleText(
-                  notificationsVM.medicationNameController.text.isEmpty
-                      ? ref.read(medicineProvider)!.name!.toUpperCase()
-                      : notificationsVM.medicationNameController.text.toUpperCase(),
-                  textAlign: TextAlign.center,
+                // Se lee como una sola frase: "Tu medicina X ha sido añadida correctamente"
+                MergeSemantics(
+                  child: Column(
+                    children: [
+                      const AppBodyText("Tu medicina", textAlign: TextAlign.center),
+                      AppTitleText(medicineName(ref).toUpperCase(), textAlign: TextAlign.center),
+                      const AppBodyText("Ha sido añadida correctamente", textAlign: TextAlign.center),
+                    ],
+                  ),
                 ),
-                const AppBodyText("Ha sido añadida correctamente", textAlign: TextAlign.center),
                 const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
@@ -107,5 +115,10 @@ class NotificationsCreated extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  static String medicineName(WidgetRef ref) {
+    final typed = ref.read(notificationsViewModelProvider).medicationNameController.text;
+    return typed.isNotEmpty ? typed : ref.read(medicineProvider)?.name ?? '';
   }
 }
