@@ -1,195 +1,88 @@
-import 'dart:convert';
-import 'package:dio/dio.dart';
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:visioncare_app/core/network/api_client.dart';
+import 'package:visioncare_app/core/network/api_exception.dart';
+import 'package:visioncare_app/core/network/token_storage.dart';
 import 'package:visioncare_app/models/user.dart';
-import 'package:visioncare_app/core/config/app_config.dart';
+
+final authServiceProvider = Provider<AuthService>((ref) {
+  return AuthService(ref.watch(apiClientProvider), ref.watch(tokenStorageProvider));
+});
 
 class AuthService {
-  final String apiUrl;
-  final Dio _dio;
-  final CookieJar _cookieJar;
+  static const _basePath = '/vc/v1';
+
+  final ApiClient _api;
+  final TokenStorage _tokens;
   final FlutterSecureStorage _secureStorage;
 
-  AuthService({this.apiUrl = '${AppConfig.apiBaseUrl}/vc/v1'})
-      : _dio = Dio(),
-        _cookieJar = CookieJar(),
-        _secureStorage = FlutterSecureStorage() {
-    _dio.interceptors.add(CookieManager(_cookieJar)); 
-  }
+  AuthService(this._api, this._tokens, [this._secureStorage = const FlutterSecureStorage()]);
 
   Future<bool> checkTokenExpired() async {
-    var authToken = await _secureStorage.read(key: 'AuthToken');
-    bool isExpired = JwtDecoder.isExpired(authToken!);
-    debugPrint('🔴 Token expira: ${JwtDecoder.getExpirationDate(authToken)}, is expired? $isExpired, duration: ${JwtDecoder.getRemainingTime(authToken)}');
+    final authToken = await _tokens.readAccessToken();
+    if (authToken == null) return true;
+    final isExpired = JwtDecoder.isExpired(authToken);
+    debugPrint('Token expira: ${JwtDecoder.getExpirationDate(authToken)}, vencido: $isExpired');
     return isExpired;
   }
 
+  /// Inicia sesion; el ApiClient guarda los tokens que el backend envia como cookies.
   Future<bool> login(String email, String password) async {
     try {
-      final response = await _dio.post(
-        '$apiUrl/authentication/sign-in',
-        options: Options(
-          headers: {
-            'Accept': '*/*',
-            'Content-Type': 'application/json',
-          },
-        ),
-        data: json.encode({
-          'email': email,
-          'password': password,
-        }),
+      await _api.post(
+        '$_basePath/authentication/sign-in',
+        data: {'email': email, 'password': password},
+        authenticated: false,
       );
-
-      if (response.statusCode == 200) {
-        await _saveCookies();
-        await getProfile();
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      debugPrint('Error during sign-in: $e');
+      await getProfile();
+      return true;
+    } on ApiException catch (e) {
+      debugPrint('Error al iniciar sesion: ${e.statusCode} ${e.message}');
       return false;
     }
   }
 
-  Future<void> _saveCookies() async {
-    List<Cookie> cookies = await _cookieJar.loadForRequest(Uri.parse(apiUrl));
-    
-    for (var cookie in cookies) {
-      await _secureStorage.write(key: cookie.name, value: cookie.value);
-    }
-  }
-
-  Future<void> _loadCookies() async {
-    List<Cookie> cookies = [];
-    
-    var authToken = await _secureStorage.read(key: 'AuthToken');
-    var refreshToken = await _secureStorage.read(key: 'RefreshToken');
-    
-    if (authToken != null) cookies.add(Cookie('AuthToken', authToken));
-    if (refreshToken != null) cookies.add(Cookie('RefreshToken', refreshToken));
-
-    await _cookieJar.saveFromResponse(Uri.parse(apiUrl), cookies);
-  }
-
   Future<bool> isUserLoggedIn() async {
-    // Las cookies deben estar cargadas antes de la peticion o se envia sin sesion
-    await _loadCookies();
     try {
-      final response = await _dio.get('$apiUrl/auth-user/me');
-      return response.statusCode == 200;
-    } on DioException {
-      // Dio lanza excepcion ante 401 u otros errores; se trata como sesion no valida
+      await _api.get('$_basePath/auth-user/me');
+      return true;
+    } on ApiException {
       return false;
     }
   }
 
   Future<void> getProfile() async {
-    await _loadCookies();
-    try {
-      final response = await _dio.get('$apiUrl/auth-user/me');
-      if (response.statusCode == 200) {
-        final userData = response.data;
-
-        final userId = userData['id'] as String?;
-
-        await _secureStorage.write(key: 'UserId', value: userId!);
-
-        // Leer para corroborar
-        final storedUserId = await _secureStorage.read(key: 'UserId');
-
-        if (storedUserId != null && storedUserId == userId) {
-          debugPrint('✅ UserId guardado correctamente en Secure Storage: $storedUserId');
-        } else {
-          debugPrint('❌ Error al guardar el UserId en Secure Storage');
-        }
-
-      } else {
-        throw Exception('Failed to fetch profile');
-      }
-      
-    } catch (e) {
-      throw Exception('Error while fetching profile: $e');
-    }
+    final response = await _api.get('$_basePath/auth-user/me');
+    final userId = response.data['id'] as String?;
+    if (userId == null) throw const ApiException('No se pudo obtener tu perfil.');
+    await _secureStorage.write(key: SecureTokenStorage.userIdKey, value: userId);
   }
 
-  Future<bool> refreshToken() async {
-    await _loadCookies();
-    try {
-      final response = await _dio.post(
-        '$apiUrl/authentication/refresh-token', 
-        options: Options(
-          headers: {'Accept': '*/*'},
-        ),
-      );
+  Future<bool> refreshToken() => _api.refreshSession();
 
-      if (response.statusCode == 200) {
-        _saveCookies();
-        return true;
-
-      } else {
-        return false;
-      }
-    } catch (e) {
-      return false;
-    }
-  }
-
+  /// Cierra la sesion en el backend y siempre borra la sesion local, aunque el backend no responda.
   Future<bool> signOut() async {
-    await _loadCookies();
-    await refreshToken();
-
     try {
-      final response = await _dio.post(
-        '$apiUrl/authentication/sign-out',
-        options: Options(
-          headers: {'Accept': '*/*'},
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        await _secureStorage.delete(key: 'AuthToken');
-        await _secureStorage.delete(key: 'RefreshToken');
-        _cookieJar.deleteAll(); 
-
-        return true;
-      } else {
-      
-        return false;
-      }
-    } catch (e) {
-      return false;
+      await _api.post('$_basePath/authentication/sign-out', sendRefreshToken: true);
+    } on ApiException catch (e) {
+      debugPrint('No se pudo cerrar la sesion en el servidor: ${e.message}');
     }
+    await _tokens.clear();
+    return true;
   }
 
   Future<bool> signUp(User user) async {
     try {
-      final response = await _dio.post(
-        '$apiUrl/authentication/sign-up',
-        options: Options(
-          headers: {
-            'Accept': '*/*',
-            'Content-Type': 'application/json',
-          },
-        ),
-        data: json.encode(user.toJson()),
+      await _api.post(
+        '$_basePath/authentication/sign-up',
+        data: user.toJson(),
+        authenticated: false,
       );
-
-      debugPrint('🔵 Sign-up response: ${response.statusCode} - ${response.data}');
-
-      if (response.statusCode == 200) {
-        final result = await login(user.email!, user.password!);
-        return result;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      debugPrint('Error during sign-up: $e');
+      return await login(user.email!, user.password!);
+    } on ApiException catch (e) {
+      debugPrint('Error al registrarse: ${e.statusCode} ${e.message}');
       return false;
     }
   }

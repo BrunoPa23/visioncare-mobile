@@ -4,7 +4,7 @@ import 'package:visioncare_app/models/medicines.dart';
 import 'package:visioncare_app/services/medication_service.dart';
 
 final getAllMedicinesProvider = FutureProvider<List<Medicines>>((ref) async {
-  final medicinesService = MedicationService();
+  final medicinesService = ref.read(medicationServiceProvider);
   debugPrint("🔴 RECOGIENDO MEDICINAS");
   final response = await medicinesService.getAllMedicationById();
   return response;
@@ -22,7 +22,7 @@ Future<void> deleteMedicine(WidgetRef ref, String medicineId) async {
   };
 
   try {
-    final medicinesService = MedicationService();
+    final medicinesService = ref.read(medicationServiceProvider);
     await medicinesService.deleteMedication(medicineId);
     // Borrar del estado de loading
     final newMap = Map<String, AsyncValue<void>>.from(ref.read(deletingMedicinesProvider));

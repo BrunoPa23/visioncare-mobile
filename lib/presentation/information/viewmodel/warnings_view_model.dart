@@ -7,7 +7,7 @@ import 'package:visioncare_app/services/open_ai_service.dart';
 final warningsViewModelProvider = FutureProvider.family<Medicines, String>((ref, searchQuery) async {
 
 
-  final openAiService = OpenAiService();
+  final openAiService = ref.read(openAiServiceProvider);
   final response = await openAiService.generateInformation(RequestTypeEnum.advertencias, searchQuery);
   return response;
 });
