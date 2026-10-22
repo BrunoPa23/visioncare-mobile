@@ -1,4 +1,4 @@
-package com.example.visioncare_app
+package pe.brunopalomino.visioncare
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visioncare_app/app/router.dart';
 import 'package:visioncare_app/core/network/api_client.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:visioncare_app/core/time/local_time_zone.dart';
 import 'package:visioncare_app/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  tz.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation('America/Lima'));
-  //imprimir zona horaria actual y hora actual
+  // Zona horaria del dispositivo; America/Lima si no se puede leer
+  await configureLocalTimeZone(() async => (await FlutterTimezone.getLocalTimezone()).identifier);
   debugPrint("Zona horaria actual: ${tz.local.name}");
   debugPrint("Hora actual: ${tz.TZDateTime.now(tz.local)}");
 

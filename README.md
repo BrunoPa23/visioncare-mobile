@@ -44,7 +44,7 @@ Los tests usan un adaptador HTTP falso (`test/helpers/fake_http.dart`), asi que 
 - Dio (un ApiClient unico inyectado con Riverpod)
 - flutter_secure_storage, jwt_decoder, sqflite
 - speech_to_text, flutter_tts
-- flutter_local_notifications, timezone
+- flutter_local_notifications, timezone, flutter_timezone
 - google_maps_flutter, google_places_flutter, location
 - image_picker
 
@@ -70,6 +70,14 @@ flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5291 --dart-define=GOOGLE
 
 - **Android:** agrega `MAPS_API_KEY=<tu clave>` en `~/.gradle/gradle.properties` (fuera del repositorio) o pasala con `-PMAPS_API_KEY=<tu clave>`.
 - **iOS:** crea `ios/Flutter/Keys.xcconfig` con `GOOGLE_MAPS_API_KEY=<tu clave>`; ese archivo esta en el `.gitignore`.
+
+## Configuracion de la app
+
+- **Identificador:** `pe.brunopalomino.visioncare` (applicationId y namespace en Android, bundle id en iOS). El nombre visible es VisionCare.
+- **Red en Android:** `network_security_config` exige HTTPS. Solo el build de debug permite HTTP, y unicamente hacia `10.0.2.2`, `localhost` y `127.0.0.1` (el backend local). Para un build de release, `API_BASE_URL` debe ser una URL `https://`.
+- **Red en iOS:** App Transport Security exige HTTPS; `NSAllowsLocalNetworking` permite HTTP solo en la red local, para probar con el backend en la PC.
+- **Zona horaria:** los recordatorios usan la zona horaria del dispositivo (`flutter_timezone`). Si no se puede leer, se usa `America/Lima`.
+- **Accesibilidad:** las pantallas principales tienen etiquetas para TalkBack y VoiceOver, areas tactiles de al menos 48 dp y respetan el tamano de texto elegido en la app. Los resultados importantes (escaneo y recordatorio creado) se anuncian al lector de pantalla o, si no esta activo, con la voz de la app.
 
 ## Equipo
 
