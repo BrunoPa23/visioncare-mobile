@@ -11,7 +11,8 @@
     <application
         android:label="VisionCare"
         android:name="${applicationName}"
-        android:icon="@mipmap/logo_app_notification">
+        android:icon="@mipmap/logo_app_notification"
+        android:networkSecurityConfig="@xml/network_security_config">
         <receiver
             android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
