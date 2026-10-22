@@ -6,7 +6,7 @@ import 'package:visioncare_app/services/auth_service.dart';
 
 final registerViewModelProvider =
     ChangeNotifierProvider.autoDispose<RegisterViewModel>(
-  (ref) => RegisterViewModel(),
+  (ref) => RegisterViewModel(ref.read(authServiceProvider)),
 );
 
 class RegisterViewModel extends ChangeNotifier {
@@ -27,7 +27,9 @@ class RegisterViewModel extends ChangeNotifier {
 
   String get selectedDegree => _selectedDegree;
 
-  RegisterViewModel() {
+  final AuthService _authService;
+
+  RegisterViewModel(this._authService) {
     emailController.addListener(_checkRegisterButtonEnabled);
     passwordController.addListener(_checkRegisterButtonEnabled);
     nameController.addListener(_checkRegisterButtonEnabled);
@@ -111,7 +113,7 @@ class RegisterViewModel extends ChangeNotifier {
     
     isLoading = true;
     notifyListeners();
-    bool result = await AuthService().signUp(user);
+    bool result = await _authService.signUp(user);
     
     isLoading = false;
     notifyListeners();

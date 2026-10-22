@@ -6,7 +6,7 @@ import 'package:visioncare_app/services/auth_service.dart';
 
 final loginViewModelProvider =
     ChangeNotifierProvider.autoDispose<LoginViewModel>(
-  (ref) => LoginViewModel(),
+  (ref) => LoginViewModel(ref.read(authServiceProvider)),
 );
 
 class LoginViewModel extends ChangeNotifier {
@@ -18,7 +18,9 @@ class LoginViewModel extends ChangeNotifier {
   bool hasBadLogin = false;
   ErrorAuthType? errorAuthType = ErrorAuthType.none;
 
-  LoginViewModel() {
+  final AuthService _authService;
+
+  LoginViewModel(this._authService) {
     emailController.addListener(_checkLoginButtonEnabled);
     passwordController.addListener(_checkLoginButtonEnabled);
   }
@@ -84,7 +86,7 @@ class LoginViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    bool result = await AuthService().login(email, password);
+    bool result = await _authService.login(email, password);
 
     isLoading = false;
     if (result) {

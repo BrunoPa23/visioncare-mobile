@@ -5,11 +5,13 @@ import 'package:visioncare_app/presentation/medicines/viewmodel/medicines_view_m
 import 'package:visioncare_app/services/auth_service.dart';
 
 final homeViewmodelProvider = ChangeNotifierProvider<HomeViewmodel>((ref) {
-  return HomeViewmodel();
+  return HomeViewmodel(ref.read(authServiceProvider));
 });
 
 class HomeViewmodel extends ChangeNotifier {
-  final AuthService _authService = AuthService();
+  final AuthService _authService;
+
+  HomeViewmodel(this._authService);
 
   Future<void> signOut(BuildContext context, ref) async {
     final result = await _authService.signOut();

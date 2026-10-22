@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:visioncare_app/services/auth_service.dart';
 
 final startupViewmodelProvider = ChangeNotifierProvider<StartupViewmodel>((ref) {
-  return StartupViewmodel();
+  return StartupViewmodel(ref.read(authServiceProvider));
 });
 
 class StartupViewmodel extends ChangeNotifier{
-  final AuthService _authService = AuthService();
+  final AuthService _authService;
+
+  StartupViewmodel(this._authService);
   
   Future<void> checkAuth(BuildContext context) async{
     final storage = FlutterSecureStorage();

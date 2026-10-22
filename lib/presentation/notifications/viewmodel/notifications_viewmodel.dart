@@ -11,7 +11,7 @@ import 'package:visioncare_app/services/notification_service.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 final notificationsViewModelProvider = ChangeNotifierProvider<NotificationsViewModel>(
-  (ref) => NotificationsViewModel(ref.read(notificationServiceProvider)),
+  (ref) => NotificationsViewModel(ref.read(notificationServiceProvider), ref.read(medicationServiceProvider)),
 );
 
 enum TypeTimeNotification {
@@ -23,9 +23,9 @@ enum TypeTimeNotification {
 class NotificationsViewModel extends ChangeNotifier {
   TypeTimeNotification? selectedType;
   final NotificationService notificationService;
-  final MedicationService medicationService = MedicationService();
+  final MedicationService medicationService;
 
-  NotificationsViewModel(this.notificationService);
+  NotificationsViewModel(this.notificationService, this.medicationService);
 
   
   setSelectedType(TypeTimeNotification type) {
