@@ -1,63 +1,50 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:visioncare_app/core/network/api_client.dart';
+import 'package:visioncare_app/core/network/api_exception.dart';
 import 'package:visioncare_app/enums/request_type_enum.dart';
 import 'package:visioncare_app/models/medicines.dart';
-import 'package:visioncare_app/core/config/app_config.dart';
-import 'package:visioncare_app/services/auth_headers.dart';
+
+final openAiServiceProvider = Provider<OpenAiService>((ref) {
+  return OpenAiService(ref.watch(apiClientProvider));
+});
 
 class OpenAiService {
-  final String apiUrl;
+  static const path = '/vc/v1/gpt/test';
 
-  OpenAiService({this.apiUrl = '${AppConfig.apiBaseUrl}/vc/v1/gpt/test'});
-  
+  final ApiClient _api;
+
+  OpenAiService(this._api);
+
+  /// Pide al backend que interprete el texto del medicamento. Si falla devuelve un
+  /// medicamento con nombre 'Error' y el motivo legible en la descripcion.
   Future<Medicines> generateInformation(RequestTypeEnum type, String texto) async {
+    try {
+      final response = await _api.post(path, data: {'tipo': type.typeName, 'texto': texto});
+      final Map<String, dynamic> data = response.data;
 
-    //POST REQUEST TO BACKEND
-    final requestBody = json.encode({
-      'tipo': type.typeName,
-      'texto': texto,
-    });
-
-    try{
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: await authHeaders({'Content-Type': 'application/json'}),
-        body: requestBody,
+      final medicines = Medicines(
+        name: data['medicamento'] ?? 'Error',
+        expirationDate: data['expirationDate'] ?? 'No encontrada',
       );
 
-      Medicines medicines = Medicines();
-
-      if(response.statusCode == 200){
-        final responseBody = response.body;
-        Map<String, dynamic> data = json.decode(responseBody);
-        
-        medicines.name = data['medicamento'] ?? 'Error';
-        medicines.expirationDate = data['expirationDate'] ?? 'No encontrada';
-
-        if(data['tipo'] == 'que_es'){
+      switch (data['tipo']) {
+        case 'que_es':
           medicines.description = data['contenido'] ?? '';
-        } 
-        
-        else if (data['tipo'] == 'efectos_secundarios') {
+        case 'efectos_secundarios':
           medicines.sideEffects = List<String>.from(data['contenido'] ?? []);
-        } 
-        
-        else if (data['tipo'] == 'instrucciones') {
+        case 'instrucciones':
           medicines.instructions = List<String>.from(data['contenido'] ?? []);
-        } 
-        
-        else if (data['tipo'] == 'advertencias') {
+        case 'advertencias':
           medicines.warnings = List<String>.from(data['contenido'] ?? []);
-        }
-        
-        return medicines;
-
-      } else {
-        return Medicines(name: 'Error', description: 'No se pudo obtener información');
       }
-    }
-    catch (e) {
-        return Medicines(name: 'Error', description: 'No se pudo obtener información');
+      return medicines;
+    } on ApiException catch (e) {
+      debugPrint('No se pudo obtener la informacion: ${e.statusCode} ${e.message}');
+      return Medicines(name: 'Error', description: 'No se pudo obtener información. ${e.message}');
+    } catch (e) {
+      debugPrint('Respuesta inesperada del backend: $e');
+      return Medicines(name: 'Error', description: 'No se pudo obtener información');
     }
   }
 }

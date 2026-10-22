@@ -9,10 +9,10 @@ import 'package:visioncare_app/services/vision_service.dart';
 
 final resultViewModelProvider = FutureProvider.family<Medicines, XFile>((ref, imageFile) async {
   debugPrint("🔴 Flag 1: Join Provider");
-  final visionService = VisionService();
+  final visionService = ref.read(visionServiceProvider);
   final response = await visionService.recognizeImage(imageFile);
   debugPrint("🔴 Flag 1: OCR successful, response: $response");
-  final openAiService = OpenAiService();
+  final openAiService = ref.read(openAiServiceProvider);
   final result = await openAiService.generateInformation(RequestTypeEnum.queEs, response);
   debugPrint("🔴 Flag 1: OpenAI response: ${result.name}");
   return result;
