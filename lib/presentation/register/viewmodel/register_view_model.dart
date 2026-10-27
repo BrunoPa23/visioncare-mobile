@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:visioncare_app/core/validation/credential_validator.dart';
 import 'package:visioncare_app/enums/error_auth_type_enum.dart';
 import 'package:visioncare_app/models/user.dart';
 import 'package:visioncare_app/services/auth_service.dart';
@@ -68,7 +69,7 @@ class RegisterViewModel extends ChangeNotifier {
   } 
 
   Future<void> register() async {
-    final email = emailController.text;
+    final email = emailController.text.trim();
     final password = passwordController.text;
     final name = nameController.text;
     final lastName = lastNameController.text;
@@ -88,14 +89,14 @@ class RegisterViewModel extends ChangeNotifier {
       return;
     }
 
-    if (!isEmailValid(email)) {
+    if (!CredentialValidator.isValidEmail(email)) {
       hasBadRegister = true;
       errorAuthType = ErrorAuthType.invalidEmail;
       notifyListeners();
       return;
     }
 
-    if (!isPasswordValid(password)) {
+    if (!CredentialValidator.isValidPassword(password)) {
       hasBadRegister = true;
       errorAuthType = ErrorAuthType.invalidPassword;
       notifyListeners();
@@ -134,15 +135,4 @@ class RegisterViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  bool isEmailValid(String email) {
-    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
-    return emailRegex.hasMatch(email);
-  }
-
-  bool isPasswordValid(String password) {
-    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$');
-    return passwordRegex.hasMatch(password);
-  }
-
 }

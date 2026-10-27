@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:visioncare_app/core/network/api_exception.dart';
+import 'package:visioncare_app/core/validation/credential_validator.dart';
 import 'package:visioncare_app/enums/error_auth_type_enum.dart';
 import 'package:visioncare_app/services/auth_service.dart';
 
@@ -17,6 +19,8 @@ class LoginViewModel extends ChangeNotifier {
   bool loginSuccessful = false;
   bool hasBadLogin = false;
   ErrorAuthType? errorAuthType = ErrorAuthType.none;
+  // Mensaje del ApiClient cuando falla la red o el servidor (no las credenciales)
+  String? _requestErrorMessage;
 
   final AuthService _authService;
 
@@ -34,6 +38,8 @@ class LoginViewModel extends ChangeNotifier {
         return 'El correo no es válido. Revisa que tenga @ y un punto, por ejemplo nombre@correo.com.';
       case ErrorAuthType.invalidPassword:
         return 'La contraseña debe tener al menos 8 caracteres, con letras y números.';
+      case ErrorAuthType.requestFailed:
+        return _requestErrorMessage ?? 'No se pudo iniciar sesión. Inténtalo otra vez.';
       default:
         return 'La contraseña no coincide con este correo. Inténtalo otra vez.';
     }
@@ -55,7 +61,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<void> login() async {
-    final email = emailController.text;
+    final email = emailController.text.trim();
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
@@ -66,7 +72,7 @@ class LoginViewModel extends ChangeNotifier {
       return;
     }
 
-    if (!isEmailValid(email)) {
+    if (!CredentialValidator.isValidEmail(email)) {
       hasBadLogin = true;
       loginSuccessful = false;
       errorAuthType = ErrorAuthType.invalidEmail;
@@ -74,7 +80,7 @@ class LoginViewModel extends ChangeNotifier {
       return;
     }
 
-    if (!isPasswordValid(password)) {
+    if (!CredentialValidator.isValidPassword(password)) {
       hasBadLogin = true;
       loginSuccessful = false;
       errorAuthType = ErrorAuthType.invalidPassword;
@@ -86,17 +92,23 @@ class LoginViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    bool result = await _authService.login(email, password);
-
-    isLoading = false;
-    if (result) {
-      loginSuccessful = true;
-      clearFields();
-    } else {
+    try {
+      final result = await _authService.login(email, password);
+      if (result) {
+        loginSuccessful = true;
+        clearFields();
+      } else {
+        hasBadLogin = true;
+        loginSuccessful = false;
+        errorAuthType = ErrorAuthType.invalidCredentials;
+      }
+    } on ApiException catch (e) {
       hasBadLogin = true;
       loginSuccessful = false;
-      errorAuthType = ErrorAuthType.none;
+      errorAuthType = ErrorAuthType.requestFailed;
+      _requestErrorMessage = e.message;
     }
+    isLoading = false;
     notifyListeners();
   }
 
@@ -105,15 +117,5 @@ class LoginViewModel extends ChangeNotifier {
       isLoginButtonEnabled.value =
           emailController.text.isNotEmpty && passwordController.text.isNotEmpty;
     });
-  }
-
-  bool isEmailValid(String email) {
-    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
-    return emailRegex.hasMatch(email);
-  }
-
-  bool isPasswordValid(String password) {
-    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$');
-    return passwordRegex.hasMatch(password);
   }
 }
