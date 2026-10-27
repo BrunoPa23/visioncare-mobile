@@ -29,6 +29,9 @@ class AuthService {
   }
 
   /// Inicia sesion; el ApiClient guarda los tokens que el backend envia como cookies.
+  ///
+  /// Devuelve false solo si el correo o la contrasena son incorrectos (401). Los errores de red,
+  /// del servidor o por exceso de intentos se lanzan como [ApiException] con su mensaje.
   Future<bool> login(String email, String password) async {
     try {
       await _api.post(
@@ -36,12 +39,13 @@ class AuthService {
         data: {'email': email, 'password': password},
         authenticated: false,
       );
-      await getProfile();
-      return true;
     } on ApiException catch (e) {
       debugPrint('Error al iniciar sesion: ${e.statusCode} ${e.message}');
-      return false;
+      if (e.isUnauthorized) return false;
+      rethrow;
     }
+    await getProfile();
+    return true;
   }
 
   Future<bool> isUserLoggedIn() async {

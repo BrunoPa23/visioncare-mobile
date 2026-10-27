@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:visioncare_app/core/network/api_exception.dart';
 import 'package:visioncare_app/core/validation/credential_validator.dart';
 import 'package:visioncare_app/enums/error_auth_type_enum.dart';
 import 'package:visioncare_app/services/auth_service.dart';
@@ -18,6 +19,8 @@ class LoginViewModel extends ChangeNotifier {
   bool loginSuccessful = false;
   bool hasBadLogin = false;
   ErrorAuthType? errorAuthType = ErrorAuthType.none;
+  // Mensaje del ApiClient cuando falla la red o el servidor (no las credenciales)
+  String? _requestErrorMessage;
 
   final AuthService _authService;
 
@@ -35,6 +38,8 @@ class LoginViewModel extends ChangeNotifier {
         return 'El correo no es válido. Revisa que tenga @ y un punto, por ejemplo nombre@correo.com.';
       case ErrorAuthType.invalidPassword:
         return 'La contraseña debe tener al menos 8 caracteres, con letras y números.';
+      case ErrorAuthType.requestFailed:
+        return _requestErrorMessage ?? 'No se pudo iniciar sesión. Inténtalo otra vez.';
       default:
         return 'La contraseña no coincide con este correo. Inténtalo otra vez.';
     }
@@ -87,17 +92,23 @@ class LoginViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    bool result = await _authService.login(email, password);
-
-    isLoading = false;
-    if (result) {
-      loginSuccessful = true;
-      clearFields();
-    } else {
+    try {
+      final result = await _authService.login(email, password);
+      if (result) {
+        loginSuccessful = true;
+        clearFields();
+      } else {
+        hasBadLogin = true;
+        loginSuccessful = false;
+        errorAuthType = ErrorAuthType.invalidCredentials;
+      }
+    } on ApiException catch (e) {
       hasBadLogin = true;
       loginSuccessful = false;
-      errorAuthType = ErrorAuthType.none;
+      errorAuthType = ErrorAuthType.requestFailed;
+      _requestErrorMessage = e.message;
     }
+    isLoading = false;
     notifyListeners();
   }
 

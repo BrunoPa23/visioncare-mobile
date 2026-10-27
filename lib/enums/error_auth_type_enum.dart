@@ -5,5 +5,7 @@ enum ErrorAuthType {
   userAlreadyExists,
   userNotFound,
   termsNotAccepted,
+  invalidCredentials,
+  requestFailed,
   none
 }
