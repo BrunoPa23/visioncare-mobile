@@ -1,0 +1,4 @@
+# Flutter regenera estos archivos con LF; fijar LF evita que aparezcan modificados en Windows
+**/generated_plugin_registrant.* text eol=lf
+**/generated_plugins.cmake text eol=lf
+**/GeneratedPluginRegistrant.* text eol=lf
